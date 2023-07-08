@@ -9,3 +9,9 @@ enum SpeedProfiles {
     eSPEED_PROF_FULL,
     eSPEED_PROF_FLANK
 };
+
+enum RunStates {
+    eSTATE_STARTED,
+    eSTATE_STOPPED,
+    eSTATE_UNKNOWN
+};

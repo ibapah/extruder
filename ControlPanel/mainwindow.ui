@@ -128,7 +128,7 @@ border-radius: 10px;</string>
            </property>
            <property name="font">
             <font>
-             <pointsize>36</pointsize>
+             <pointsize>54</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -254,7 +254,7 @@ border-radius: 10px;</string>
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -279,13 +279,15 @@ border-radius: 10px;</string>
              <bold>true</bold>
             </font>
            </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">QGroupBox { 
-     border: 1px solid green; 
- }</string>
+            <string notr="true">background-color: rgb(39, 55, 77);
+border-radius: 10px;</string>
            </property>
            <property name="title">
             <string>Profiles</string>
@@ -318,7 +320,7 @@ border-radius: 10px;</string>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <widget class="QRadioButton" name="radioButton">
+            <widget class="QRadioButton" name="flank_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -333,7 +335,11 @@ border-radius: 10px;</string>
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -356,7 +362,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_2">
+            <widget class="QRadioButton" name="full_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -371,7 +377,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -394,7 +404,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_3">
+            <widget class="QRadioButton" name="medium_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -409,7 +419,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -432,7 +446,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_4">
+            <widget class="QRadioButton" name="slow_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -447,7 +461,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -485,7 +503,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -531,7 +553,7 @@ QRadioButton::indicator:unchecked {
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <widget class="QRadioButton" name="ratio_rbtn1">
+            <widget class="QRadioButton" name="ratio1_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -546,7 +568,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -569,7 +595,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_12">
+            <widget class="QRadioButton" name="ratio2_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -584,7 +610,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -607,7 +637,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_13">
+            <widget class="QRadioButton" name="ratio3_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -622,7 +652,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -645,7 +679,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_14">
+            <widget class="QRadioButton" name="ratio4_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -660,7 +694,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -683,7 +721,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="radioButton_15">
+            <widget class="QRadioButton" name="ratio5_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -698,7 +736,11 @@ QRadioButton::indicator:unchecked {
               </font>
              </property>
              <property name="styleSheet">
-              <string notr="true">QRadioButton::indicator {
+              <string notr="true">QRadioButton::checked {
+	background-color : rgb(63, 73, 127);   
+}
+
+QRadioButton::indicator {
     width: 50px;
     height: 50px;
     border-radius: 25px;
@@ -739,7 +781,7 @@ QRadioButton::indicator:unchecked {
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -764,7 +806,7 @@ QRadioButton::indicator:unchecked {
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -789,7 +831,7 @@ QRadioButton::indicator:unchecked {
             </font>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -808,7 +850,7 @@ QRadioButton::indicator:unchecked {
             </rect>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -827,7 +869,7 @@ QRadioButton::indicator:unchecked {
             </rect>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: #0000FF;</string>
+            <string notr="true">background-color: rgb(39, 55, 77);</string>
            </property>
            <property name="lineWidth">
             <number>1</number>
@@ -946,7 +988,7 @@ QPushButton::focus {
            </property>
            <property name="styleSheet">
             <string notr="true">image: url(:/icons/link.svg);
-border: 3px solid blue;</string>
+border: 3px solid rgb(39, 55, 77);</string>
            </property>
            <property name="text">
             <string/>
@@ -972,7 +1014,7 @@ border: 3px solid blue;</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="sealscreen">
+      <widget class="QWidget" name="settingsscreen">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="leftMargin">
          <number>0</number>
@@ -997,15 +1039,15 @@ border: 3px solid blue;</string>
           <widget class="QLabel" name="label_4">
            <property name="geometry">
             <rect>
-             <x>240</x>
+             <x>760</x>
              <y>0</y>
-             <width>331</width>
-             <height>81</height>
+             <width>400</width>
+             <height>120</height>
             </rect>
            </property>
            <property name="font">
             <font>
-             <pointsize>48</pointsize>
+             <pointsize>54</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -1020,10 +1062,10 @@ border: 3px solid blue;</string>
           <widget class="QPushButton" name="ss_back_btn">
            <property name="geometry">
             <rect>
-             <x>710</x>
-             <y>410</y>
-             <width>50</width>
-             <height>50</height>
+             <x>1760</x>
+             <y>950</y>
+             <width>100</width>
+             <height>100</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -1035,54 +1077,6 @@ border: 3px solid blue;</string>
           </widget>
          </widget>
         </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="washsealscreen">
-       <layout class="QVBoxLayout" name="verticalLayout_13">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="genericinfoscreen">
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="adminscreen">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
        </layout>
       </widget>
      </widget>

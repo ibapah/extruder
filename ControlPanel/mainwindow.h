@@ -44,6 +44,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    enum RunStates e_run_state;
     float f_extruder_rpm = 1000.0;
     float f_caterpillar_rpm = 500.0;
     float f_stepper_pps = 1.1;

@@ -21,11 +21,12 @@ MainWindow::MainWindow(QWidget *parent)
     Qt::WindowFlags flags = this->windowFlags();
     this->setWindowFlags( flags | Qt::FramelessWindowHint );
 #endif
+    e_run_state = eSTATE_STOPPED;
     ui->extruder_lcd->display(f_extruder_rpm);
     ui->caterpillar_lcd->display(f_caterpillar_rpm);
     ui->stepper_lcd->display(f_stepper_pps);
     ui->load_rbtn->setChecked(true);
-    ui->ratio_rbtn1->setChecked(true);
+    ui->ratio1_rbtn->setChecked(true);
 
     on_linkbtn_clicked();
 
@@ -46,7 +47,7 @@ void MainWindow::on_linkbtn_clicked()
         ui->hline4->show();
         ui->vline1->show();
         ui->vline2->show();
-        ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); border: 3px solid blue;");
+        ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); border: 3px solid rgb(39, 55, 77);");
     } else {
         b_link = true;
         ui->hline1->hide();
@@ -55,7 +56,7 @@ void MainWindow::on_linkbtn_clicked()
         ui->hline4->hide();
         ui->vline1->hide();
         ui->vline2->hide();
-        ui->linkbtn->setStyleSheet("image: url(:/icons/unlink.svg); border: 3px solid blue;");
+        ui->linkbtn->setStyleSheet("image: url(:/icons/unlink.svg); border: 3px solid rgb(39, 55, 77);");
     }
 }
 
@@ -174,6 +175,10 @@ void MainWindow::setRunScreenValues(enum SpeedProfiles profile)
 
 void MainWindow::on_buttonGroup_buttonClicked(QAbstractButton *button)
 {
+    if ( e_run_state == eSTATE_STARTED ) {
+        return;
+    }
+
     if ( ! button->text().compare("Flank") ) {
         setRunScreenValues(eSPEED_PROF_FLANK);
     } else if ( ! button->text().compare("Full") ) {
@@ -191,15 +196,24 @@ void MainWindow::on_buttonGroup_buttonClicked(QAbstractButton *button)
 
 void MainWindow::on_buttonGroup_2_buttonClicked(QAbstractButton *button)
 {
+    if ( e_run_state == eSTATE_STARTED ) {
+        return;
+    }
     qDebug()<<button->text();
 }
 
 void MainWindow::on_run_btn_clicked()
 {
     if ( ! ui->run_btn->text().compare("Start") ) {
+        e_run_state = eSTATE_STOPPED;
+        ui->groupBox->setEnabled(false);
+        ui->groupBox_2->setEnabled(false);
         ui->run_btn->setText("Stop");
         ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
     } else {
+        e_run_state = eSTATE_STARTED;
+        ui->groupBox->setEnabled(true);
+        ui->groupBox_2->setEnabled(true);
         ui->run_btn->setText("Start");
         ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
     }
