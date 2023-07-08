@@ -5,7 +5,6 @@
 #include <QThread>
 #include <QDateTime>
 #include <QTimer>
-#include <QUuid>
 #include <QQueue>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -166,8 +165,6 @@ void MainWindow::setRunScreenValues(enum SpeedProfiles profile)
         }
     }
 
-    qDebug()<<"setRunScreenValues: "<<profile;
-
     ui->extruder_lcd->display(f_extruder_rpm);
     ui->caterpillar_lcd->display(f_caterpillar_rpm);
     ui->stepper_lcd->display(f_stepper_pps);
@@ -175,10 +172,6 @@ void MainWindow::setRunScreenValues(enum SpeedProfiles profile)
 
 void MainWindow::on_buttonGroup_buttonClicked(QAbstractButton *button)
 {
-    if ( e_run_state == eSTATE_STARTED ) {
-        return;
-    }
-
     if ( ! button->text().compare("Flank") ) {
         setRunScreenValues(eSPEED_PROF_FLANK);
     } else if ( ! button->text().compare("Full") ) {
@@ -196,25 +189,22 @@ void MainWindow::on_buttonGroup_buttonClicked(QAbstractButton *button)
 
 void MainWindow::on_buttonGroup_2_buttonClicked(QAbstractButton *button)
 {
-    if ( e_run_state == eSTATE_STARTED ) {
-        return;
-    }
     qDebug()<<button->text();
 }
 
 void MainWindow::on_run_btn_clicked()
 {
-    if ( ! ui->run_btn->text().compare("Start") ) {
+    if ( ! ui->run_btn->text().compare("START") ) {
         e_run_state = eSTATE_STOPPED;
         ui->groupBox->setEnabled(false);
         ui->groupBox_2->setEnabled(false);
-        ui->run_btn->setText("Stop");
+        ui->run_btn->setText("STOP");
         ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
     } else {
         e_run_state = eSTATE_STARTED;
         ui->groupBox->setEnabled(true);
         ui->groupBox_2->setEnabled(true);
-        ui->run_btn->setText("Start");
+        ui->run_btn->setText("START");
         ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
     }
 }

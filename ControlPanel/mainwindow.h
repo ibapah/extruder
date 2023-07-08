@@ -3,13 +3,9 @@
 #include <QMainWindow>
 #include "common.h"
 #include <QTimer>
-#include <QKeyEvent>
-#include <QNetworkInterface>
-#include <QProcess>
 #include <QLabel>
 #include <QElapsedTimer>
 #include <QButtonGroup>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
