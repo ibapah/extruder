@@ -13,9 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setMinimumSize(800, 480);
-    this->setMaximumSize(800, 480);
-    this->setGeometry(800, 400, 800, 480);
+    this->setMinimumSize(1920, 1080);
+    this->setMaximumSize(1920, 1080);
+    this->setGeometry(0, 0, 1920, 1080);
 
 #ifdef __arm__
     Qt::WindowFlags flags = this->windowFlags();
@@ -34,11 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-
 }
 
 void MainWindow::on_linkbtn_clicked()

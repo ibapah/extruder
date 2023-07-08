@@ -28,7 +28,6 @@ public slots:
 protected:
 
 private slots:
-    void on_pushButton_clicked();
     void on_linkbtn_clicked();
     void on_extruder_up_btn_clicked();
     void on_extruder_down_btn_clicked();
