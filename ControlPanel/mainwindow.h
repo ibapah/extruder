@@ -35,8 +35,14 @@ private slots:
     void on_ss_back_btn_clicked();
     void on_buttonGroup_buttonClicked(QAbstractButton *);
     void on_buttonGroup_2_buttonClicked(QAbstractButton *);
-
     void on_run_btn_clicked();
+    void on_ss_profile_editsave_btn_clicked();
+    void on_ss_profiles_cbox_currentIndexChanged(int index);
+    void on_ss_diameter_ledit_textEdited(const QString &arg1);
+    void on_ss_maxerpm_ledit_textEdited(const QString &arg1);
+    void on_ss_crpmfactor_ledit_textEdited(const QString &arg1);
+    void on_ss_colorfactor_ledit_textEdited(const QString &arg1);
+    void on_ss_unit_cbox_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
@@ -45,4 +51,6 @@ private:
     float f_caterpillar_rpm = 500.0;
     float f_stepper_pps = 1.1;
     bool b_link = false;
+    bool ss_profile_edit = false;
+    struct ProfileParams m_profiles[MAX_PROFILE_COUNT];
 };

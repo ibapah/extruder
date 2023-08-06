@@ -290,7 +290,7 @@ border-radius: 10px;</string>
 border-radius: 10px;</string>
            </property>
            <property name="title">
-            <string>Profiles</string>
+            <string/>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -548,12 +548,12 @@ QRadioButton::indicator:unchecked {
              </font>
             </property>
             <property name="title">
-             <string>Ratio</string>
+             <string>Profiles</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <widget class="QRadioButton" name="ratio1_rbtn">
+            <widget class="QRadioButton" name="profile1_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -589,13 +589,13 @@ QRadioButton::indicator:unchecked {
 }</string>
              </property>
              <property name="text">
-              <string>1 1/4 inch</string>
+              <string>1.25 inch</string>
              </property>
              <attribute name="buttonGroup">
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="ratio2_rbtn">
+            <widget class="QRadioButton" name="profile2_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -637,7 +637,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="ratio3_rbtn">
+            <widget class="QRadioButton" name="profile3_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -679,7 +679,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="ratio4_rbtn">
+            <widget class="QRadioButton" name="profile4_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -721,7 +721,7 @@ QRadioButton::indicator:unchecked {
               <string notr="true">buttonGroup_2</string>
              </attribute>
             </widget>
-            <widget class="QRadioButton" name="ratio5_rbtn">
+            <widget class="QRadioButton" name="profile5_rbtn">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -1029,14 +1029,14 @@ border: 3px solid rgb(39, 55, 77);</string>
          <number>0</number>
         </property>
         <item>
-         <widget class="QFrame" name="frame">
+         <widget class="QFrame" name="ss_main_frame">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
-          <widget class="QLabel" name="label_4">
+          <widget class="QLabel" name="ss_header_lbl">
            <property name="geometry">
             <rect>
              <x>760</x>
@@ -1070,6 +1070,630 @@ border: 3px solid rgb(39, 55, 77);</string>
            </property>
            <property name="styleSheet">
             <string notr="true">image: url(:/icons/back.svg);</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QComboBox" name="ss_profiles_cbox">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>200</y>
+             <width>281</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>38</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox {
+	color: #d3dae3;
+	background-color: #222b2e;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+}
+QComboBox::down-arrow {
+    image: url(:/icons/down.svg); 
+}
+QComboBox::drop-down {
+    width: 90px;
+}
+</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>3</string>
+            </property>
+           </item>
+          </widget>
+          <widget class="QLabel" name="ss_profiles_lbl">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>120</y>
+             <width>281</width>
+             <height>75</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>38</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Profiles</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_maxerpm_lbl">
+           <property name="geometry">
+            <rect>
+             <x>760</x>
+             <y>140</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Max E RPM</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_crpmfactor_lbl">
+           <property name="geometry">
+            <rect>
+             <x>1090</x>
+             <y>140</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>C RPM Factor</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_colorfactor_lbl">
+           <property name="geometry">
+            <rect>
+             <x>1410</x>
+             <y>140</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Color Factor (%)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_maxerpm_ledit">
+           <property name="geometry">
+            <rect>
+             <x>770</x>
+             <y>200</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_crpmfactor_ledit">
+           <property name="geometry">
+            <rect>
+             <x>1090</x>
+             <y>200</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_colorfactor_ledit">
+           <property name="geometry">
+            <rect>
+             <x>1410</x>
+             <y>200</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="ss_profile_editsave_btn">
+           <property name="geometry">
+            <rect>
+             <x>1760</x>
+             <y>200</y>
+             <width>100</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/icons/edit.svg);
+border: 1px solid #4fa08b;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_diameter_lbl">
+           <property name="geometry">
+            <rect>
+             <x>360</x>
+             <y>140</y>
+             <width>391</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Diameter</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_diameter_ledit">
+           <property name="geometry">
+            <rect>
+             <x>360</x>
+             <y>200</y>
+             <width>201</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border: 1px solid #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
+          </widget>
+          <widget class="QComboBox" name="ss_unit_cbox">
+           <property name="geometry">
+            <rect>
+             <x>560</x>
+             <y>200</y>
+             <width>191</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox {
+	color: #d3dae3;
+	background-color: #222b2e;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+}
+QComboBox::down-arrow {
+    image: url(:/icons/down.svg); 
+}
+QComboBox::drop-down {
+    width: 90px;
+}
+</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>mm</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>cm</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>inch</string>
+            </property>
+           </item>
+          </widget>
+          <widget class="QComboBox" name="ss_profiles_cbox_2">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>410</y>
+             <width>281</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>38</pointsize>
+            </font>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QComboBox {
+	color: #d3dae3;
+	background-color: #222b2e;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+}
+QComboBox::down-arrow {
+    image: url(:/icons/down.svg); 
+}
+QComboBox::drop-down {
+    width: 90px;
+}
+</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>Flank</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Full</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Medium</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Slow</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Load</string>
+            </property>
+           </item>
+          </widget>
+          <widget class="QLabel" name="ss_profiles_lbl_2">
+           <property name="geometry">
+            <rect>
+             <x>20</x>
+             <y>330</y>
+             <width>281</width>
+             <height>75</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>38</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Speed</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_maxerpm_lbl_2">
+           <property name="geometry">
+            <rect>
+             <x>350</x>
+             <y>350</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>???</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_maxerpm_ledit_2">
+           <property name="geometry">
+            <rect>
+             <x>360</x>
+             <y>410</y>
+             <width>381</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNone</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_crpmfactor_lbl_2">
+           <property name="geometry">
+            <rect>
+             <x>1080</x>
+             <y>350</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>???</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_colorfactor_lbl_2">
+           <property name="geometry">
+            <rect>
+             <x>1400</x>
+             <y>350</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>??</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLabel" name="ss_maxerpm_lbl_3">
+           <property name="geometry">
+            <rect>
+             <x>750</x>
+             <y>350</y>
+             <width>300</width>
+             <height>55</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>30</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>???</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_colorfactor_ledit_2">
+           <property name="geometry">
+            <rect>
+             <x>1400</x>
+             <y>410</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNone</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_crpmfactor_ledit_2">
+           <property name="geometry">
+            <rect>
+             <x>1080</x>
+             <y>410</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNone</set>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="ss_maxerpm_ledit_3">
+           <property name="geometry">
+            <rect>
+             <x>760</x>
+             <y>410</y>
+             <width>300</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #4fa08b;
+	background-color: #222b2e;
+	color: #d3dae3;
+}</string>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhNone</set>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="ss_profile_editsave_btn_2">
+           <property name="geometry">
+            <rect>
+             <x>1760</x>
+             <y>410</y>
+             <width>100</width>
+             <height>100</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>36</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">image: url(:/icons/edit.svg);
+border: 1px solid #4fa08b;</string>
            </property>
            <property name="text">
             <string/>
