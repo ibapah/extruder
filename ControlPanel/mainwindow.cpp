@@ -69,7 +69,7 @@ void MainWindow::on_linkbtn_clicked()
         ui->hline4->show();
         ui->vline1->show();
         ui->vline2->show();
-        ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); border: 3px solid rgb(39, 55, 77);");
+        ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); background-color : rgb(63, 73, 127); border: 3px solid rgb(39, 55, 77);");
     } else {
         b_link = true;
         ui->hline1->hide();
