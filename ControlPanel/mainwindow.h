@@ -18,7 +18,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void setRunScreenValues(enum SpeedProfiles);
 public slots:
 
 protected:
@@ -33,16 +32,24 @@ private slots:
     void on_stepper_down_btn_clicked();
     void on_settings_btn_clicked();
     void on_ss_back_btn_clicked();
-    void on_buttonGroup_buttonClicked(QAbstractButton *);
-    void on_buttonGroup_2_buttonClicked(QAbstractButton *);
     void on_run_btn_clicked();
-    void on_ss_profile_editsave_btn_clicked();
-    void on_ss_profiles_cbox_currentIndexChanged(int index);
-    void on_ss_diameter_ledit_textEdited(const QString &arg1);
+    void on_ss_params_editsave_btn_clicked();
+    void on_ss_products_cbox_currentIndexChanged(int index);
     void on_ss_maxerpm_ledit_textEdited(const QString &arg1);
     void on_ss_crpmfactor_ledit_textEdited(const QString &arg1);
     void on_ss_colorfactor_ledit_textEdited(const QString &arg1);
-    void on_ss_unit_cbox_currentIndexChanged(int index);
+    void on_ss_product_edit_btn_clicked();
+    void on_ins_input_text_ledit_returnPressed();
+    void on_ins_back_btn_clicked();
+    void on_ins_input_text_ledit_textEdited(const QString &arg1);
+    void on_ss_speed_edit_btn_clicked();
+    void on_ss_speeds_cbox_currentIndexChanged(int index);
+
+    void on_ins_input_save_btn_clicked();
+
+public slots:
+    void on_productBtngrpButtonClicked(int);
+    void on_speedBtngrpButtonClicked(int);
 
 private:
     Ui::MainWindow *ui;
@@ -52,5 +59,7 @@ private:
     float f_stepper_pps = 1.1;
     bool b_link = false;
     bool ss_profile_edit = false;
-    struct ProfileParams m_profiles[MAX_PROFILE_COUNT];
+    QButtonGroup productBtngrp;
+    QButtonGroup speedBtngrp;
+    struct ProductParams m_products[MAX_PRODUCT_PARAMS_COUNT];
 };

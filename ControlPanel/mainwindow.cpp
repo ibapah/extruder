@@ -20,49 +20,61 @@ MainWindow::MainWindow(QWidget *parent)
     Qt::WindowFlags flags = this->windowFlags();
     this->setWindowFlags( flags | Qt::FramelessWindowHint );
 #endif
-    // hide unused profiles
-    ui->profile4_rbtn->hide();
-    ui->profile5_rbtn->hide();
+    // hide unused products
+    ui->product4_rbtn->hide();
+    ui->product5_rbtn->hide();
 
     e_run_state = eSTATE_STOPPED;
     ui->extruder_lcd->display(f_extruder_rpm);
     ui->caterpillar_lcd->display(f_caterpillar_rpm);
     ui->stepper_lcd->display(f_stepper_pps);
-    ui->load_rbtn->setChecked(true);
-    ui->profile1_rbtn->setChecked(true);
+    ui->speed1_rbtn->setChecked(true);
+    ui->product1_rbtn->setChecked(true);
 
     on_linkbtn_clicked();
 
-    // init profile values
-    strcpy(m_profiles[0].diameter, "1.25");
-    m_profiles[0].unittype = eUNIT_INCH;
-    m_profiles[0].maxerpm = 1000;
-    m_profiles[0].crpmfactor = 0.372;
-    m_profiles[0].colorfactor = 4.6;
+    QList<QRadioButton *> productButtons = ui->products_grpbox->findChildren<QRadioButton *>();
+    for(int i = 0; i < productButtons.size(); ++i) {
+        productBtngrp.addButton(productButtons[i],i);
+    }
+    QList<QRadioButton *> speedButtons = ui->speeds_grpbox->findChildren<QRadioButton *>();
+    for(int i = 0; i < speedButtons.size(); ++i) {
+       speedBtngrp.addButton(speedButtons[i],i);
+    }
+    connect(&productBtngrp, SIGNAL(buttonClicked(int)), this, SLOT(on_productBtngrpButtonClicked(int)) );
+    connect(&speedBtngrp, SIGNAL(buttonClicked(int)), this, SLOT(on_speedBtngrpButtonClicked(int)) );
 
-    strcpy(m_profiles[1].diameter, "13/16");
-    m_profiles[1].unittype = eUNIT_MM;
-    m_profiles[1].maxerpm = 700;
-    m_profiles[1].crpmfactor = 2.33;
-    m_profiles[1].colorfactor = 4;
-
-    strcpy(m_profiles[2].diameter, "2");
-    m_profiles[2].unittype = eUNIT_INCH;
-    m_profiles[2].maxerpm = 500;
-    m_profiles[2].crpmfactor = 1.43;
-    m_profiles[2].colorfactor = 3.6;
+    // init with dummy values
+    strcpy(m_products[0].name, "1.25 inch");
+    strcpy(m_products[1].name, "13/16 mm");
+    strcpy(m_products[2].name, "2 inch");
+    for (int i=0; i<MAX_PRODUCT_PARAMS_COUNT; i++) {
+        for(int j=0; j<MAX_SPEED_PARAMS_COUNT; j++) {
+            m_products[i].params[j].erpm = ((i+1)*(j+1)+2)*100;
+            m_products[i].params[j].crpm = ((i+1)*(j+1)+2)*50;
+            m_products[i].params[j].color = (float)4.6+((i+1)*(j+1)+1.0);
+            //qDebug()<<i<<":"<<j<<"["<<m_products[i].params[j].erpm<<","<<m_products[i].params[j].crpm<<","<<m_products[i].params[j].color<<"]";
+        }
+    }
 
     return;
 }
 
 MainWindow::~MainWindow()
 {
+
 }
 
 void MainWindow::on_linkbtn_clicked()
 {
     if (b_link) {
         b_link = false;
+        // set values
+        int product_idx = productBtngrp.checkedId();
+        int speed_idx = speedBtngrp.checkedId();
+        ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
+        ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
+        ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
         ui->hline1->show();
         ui->hline2->show();
         ui->hline3->show();
@@ -88,13 +100,11 @@ void MainWindow::on_extruder_up_btn_clicked()
     ui->extruder_lcd->display(f_extruder_rpm);
 }
 
-
 void MainWindow::on_extruder_down_btn_clicked()
 {
     f_extruder_rpm -= 1;
     ui->extruder_lcd->display(f_extruder_rpm);
 }
-
 
 void MainWindow::on_caterpillar_up_btn_clicked()
 {
@@ -102,13 +112,11 @@ void MainWindow::on_caterpillar_up_btn_clicked()
     ui->caterpillar_lcd->display(f_caterpillar_rpm);
 }
 
-
 void MainWindow::on_caterpillar_down_btn_clicked()
 {
     f_caterpillar_rpm -= 1;
     ui->caterpillar_lcd->display(f_caterpillar_rpm);
 }
-
 
 void MainWindow::on_stepper_up_btn_clicked()
 {
@@ -116,251 +124,191 @@ void MainWindow::on_stepper_up_btn_clicked()
     ui->stepper_lcd->display(f_stepper_pps);
 }
 
-
 void MainWindow::on_stepper_down_btn_clicked()
 {
     f_stepper_pps -= 1;
     ui->stepper_lcd->display(f_stepper_pps);
 }
 
-
 void MainWindow::on_settings_btn_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
-    ui->ss_profiles_cbox->setCurrentIndex(1);
-    ui->ss_profiles_cbox->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
+    ui->ss_products_cbox->setCurrentIndex(1);
+    ui->ss_products_cbox->setCurrentIndex(0);
     // disable edit
-    ui->ss_diameter_ledit->setReadOnly(true);
     ui->ss_maxerpm_ledit->setReadOnly(true);
     ui->ss_crpmfactor_ledit->setReadOnly(true);
     ui->ss_colorfactor_ledit->setReadOnly(true);
-     ui->ss_unit_cbox->setCurrentIndex(m_profiles[0].unittype);
-    ui->ss_unit_cbox->setEnabled(false);
 }
 
 void MainWindow::on_ss_back_btn_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(eRUN_SCREEN);
 }
 
-void MainWindow::setRunScreenValues(enum SpeedProfiles profile)
+void MainWindow::on_productBtngrpButtonClicked(int product_idx)
 {
     if (b_link)
         return;
-
-    switch(profile)
-    {
-        case eSPEED_PROF_LOAD:
-        {
-            f_extruder_rpm = 100.0;
-            f_caterpillar_rpm = 50.0;
-            f_stepper_pps = 1.0;
-        }
-        break;
-
-        case eSPEED_PROF_LOW:
-        {
-            f_extruder_rpm = 200.0;
-            f_caterpillar_rpm = 100.0;
-            f_stepper_pps = 2.0;
-        }
-        break;
-
-        case eSPEED_PROF_MEDIUM:
-        {
-            f_extruder_rpm = 300.0;
-            f_caterpillar_rpm = 150.0;
-            f_stepper_pps = 3.0;
-        }
-        break;
-
-        case eSPEED_PROF_FULL:
-        {
-            f_extruder_rpm = 400.0;
-            f_caterpillar_rpm = 200.0;
-            f_stepper_pps = 4.0;
-        }
-        break;
-
-        case eSPEED_PROF_FLANK:
-        {
-            f_extruder_rpm = 500.0;
-            f_caterpillar_rpm = 250.0;
-            f_stepper_pps = 5.0;
-        }
-        break;
-
-        default:
-        {
-            return;
-        }
-    }
-
-    ui->extruder_lcd->display(f_extruder_rpm);
-    ui->caterpillar_lcd->display(f_caterpillar_rpm);
-    ui->stepper_lcd->display(f_stepper_pps);
+    int speed_idx = speedBtngrp.checkedId();
+    ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
+    ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
+    ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
 }
 
-void MainWindow::on_buttonGroup_buttonClicked(QAbstractButton *button)
+void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
 {
-    if ( ! button->text().compare("Flank") ) {
-        setRunScreenValues(eSPEED_PROF_FLANK);
-    } else if ( ! button->text().compare("Full") ) {
-        setRunScreenValues(eSPEED_PROF_FULL);
-    } else if ( ! button->text().compare("Medium") ) {
-        setRunScreenValues(eSPEED_PROF_MEDIUM);
-    } else if ( ! button->text().compare("Slow") ) {
-        setRunScreenValues(eSPEED_PROF_LOW);
-    } else if ( ! button->text().compare("Load") ) {
-        setRunScreenValues(eSPEED_PROF_LOAD);
-    } else {
-        qDebug()<<"Unknown";
-    }
-}
-
-void MainWindow::on_buttonGroup_2_buttonClicked(QAbstractButton *button)
-{
-    qDebug()<<button->text();
+    if (b_link)
+        return;
+    int product_idx = productBtngrp.checkedId();
+    ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
+    ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
+    ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
 }
 
 void MainWindow::on_run_btn_clicked()
 {
     if ( ! ui->run_btn->text().compare("START") ) {
         e_run_state = eSTATE_STOPPED;
-        ui->groupBox->setEnabled(false);
-        ui->groupBox_2->setEnabled(false);
+        ui->products_grpbox->setEnabled(false);
+        ui->speeds_grpbox->setEnabled(false);
         ui->run_btn->setText("STOP");
         ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
     } else {
         e_run_state = eSTATE_STARTED;
-        ui->groupBox->setEnabled(true);
-        ui->groupBox_2->setEnabled(true);
+        ui->products_grpbox->setEnabled(true);
+        ui->speeds_grpbox->setEnabled(true);
         ui->run_btn->setText("START");
         ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
     }
 }
 
-
-void MainWindow::on_ss_profile_editsave_btn_clicked()
+void MainWindow::on_ss_params_editsave_btn_clicked()
 {
     if ( !ss_profile_edit ) {
         ss_profile_edit = true;
-        // enable edit
-        ui->ss_diameter_ledit->setReadOnly(false);
         ui->ss_maxerpm_ledit->setReadOnly(false);
         ui->ss_crpmfactor_ledit->setReadOnly(false);
         ui->ss_colorfactor_ledit->setReadOnly(false);
-        ui->ss_unit_cbox->setEnabled(true);
-        ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid #4fa08b; background-color: #222b2e;");
+        ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid #4fa08b; background-color: #222b2e;");
     } else {
         ss_profile_edit = false;
-        //update profile1 names
-        if (m_profiles[0].unittype == eUNIT_MM) {
-            ui->profile1_rbtn->setText(QString("%1 %2").arg(m_profiles[0].diameter, "mm"));
-        } else if (m_profiles[0].unittype == eUNIT_CM) {
-            ui->profile1_rbtn->setText(QString("%1 %2").arg(m_profiles[0].diameter, "cm"));
-        } else {
-            ui->profile1_rbtn->setText(QString("%1 %2").arg(m_profiles[0].diameter, "inch"));
-        }
-        //update profile2 names
-        if (m_profiles[1].unittype == eUNIT_MM) {
-            ui->profile2_rbtn->setText(QString("%1 %2").arg(m_profiles[1].diameter, "mm"));
-        } else if (m_profiles[1].unittype == eUNIT_CM) {
-            ui->profile2_rbtn->setText(QString("%1 %2").arg(m_profiles[1].diameter, "cm"));
-        } else {
-            ui->profile2_rbtn->setText(QString("%1 %2").arg(m_profiles[1].diameter, "inch"));
-        }
-        //update profile3 names
-        if (m_profiles[2].unittype == eUNIT_MM) {
-            ui->profile3_rbtn->setText(QString("%1 %2").arg(m_profiles[2].diameter, "mm"));
-        } else if (m_profiles[2].unittype == eUNIT_CM) {
-            ui->profile3_rbtn->setText(QString("%1 %2").arg(m_profiles[2].diameter, "cm"));
-        } else {
-            ui->profile3_rbtn->setText(QString("%1 %2").arg(m_profiles[2].diameter, "inch"));
-        }
-        // disable edit
-        ui->ss_diameter_ledit->setReadOnly(true);
+        int speep_idx = ui->ss_speeds_cbox->currentIndex();
+        int product_idx = ui->ss_products_cbox->currentIndex();
+        m_products[product_idx].params[speep_idx].erpm = ui->ss_maxerpm_ledit->text().toInt();
+        m_products[product_idx].params[speep_idx].crpm = ui->ss_crpmfactor_ledit->text().toInt();
+        m_products[product_idx].params[speep_idx].color = ui->ss_colorfactor_ledit->text().toFloat();
+
         ui->ss_maxerpm_ledit->setReadOnly(true);
         ui->ss_crpmfactor_ledit->setReadOnly(true);
         ui->ss_colorfactor_ledit->setReadOnly(true);
-        ui->ss_unit_cbox->setEnabled(false);
-        ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/edit.svg); border: 1px solid #4fa08b; background-color: #000000;");
+        ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/edit.svg); border: 1px solid #4fa08b; background-color: #000000;");
         ui->ss_maxerpm_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
         ui->ss_crpmfactor_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
         ui->ss_colorfactor_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
-        ui->ss_diameter_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
     }
-}
-
-void MainWindow::on_ss_profiles_cbox_currentIndexChanged(int idx)
-{
-    if (idx > MAX_PROFILE_COUNT) {
-        return;
-    }
-    ui->ss_diameter_ledit->setText(QString(m_profiles[idx].diameter));
-    ui->ss_maxerpm_ledit->setText(QString::number(m_profiles[idx].maxerpm));
-    ui->ss_crpmfactor_ledit->setText(QString::number(m_profiles[idx].crpmfactor));
-    ui->ss_colorfactor_ledit->setText(QString::number(m_profiles[idx].colorfactor));
-}
-
-void MainWindow::on_ss_diameter_ledit_textEdited(const QString &text)
-{
-    int idx = ui->ss_profiles_cbox->currentIndex();
-    strcpy(m_profiles[idx].diameter, text.toStdString().c_str());
-    ui->ss_diameter_ledit->setStyleSheet("border: 1px solid red;");
-    ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
 
 void MainWindow::on_ss_maxerpm_ledit_textEdited(const QString &text)
 {
-    int idx = ui->ss_profiles_cbox->currentIndex();
-    m_profiles[idx].maxerpm = text.toInt();
+    int product_idx = ui->ss_products_cbox->currentIndex();
+    int speep_idx = ui->ss_speeds_cbox->currentIndex();
+    m_products[product_idx].params[speep_idx].erpm = text.toInt();
     ui->ss_maxerpm_ledit->setStyleSheet("border: 1px solid red;");
-    ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
+    ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
 
 void MainWindow::on_ss_crpmfactor_ledit_textEdited(const QString &text)
 {
-    int idx = ui->ss_profiles_cbox->currentIndex();
-    m_profiles[idx].crpmfactor = text.toInt();
+    int product_idx = ui->ss_products_cbox->currentIndex();
+    int speep_idx = ui->ss_speeds_cbox->currentIndex();
+    m_products[product_idx].params[speep_idx].crpm = text.toInt();
     ui->ss_crpmfactor_ledit->setStyleSheet("border: 1px solid red;");
-    ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
+    ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
 
 void MainWindow::on_ss_colorfactor_ledit_textEdited(const QString &text)
-{
-    int idx = ui->ss_profiles_cbox->currentIndex();
-    m_profiles[idx].colorfactor = text.toInt();
+{    
+    int product_idx = ui->ss_products_cbox->currentIndex();
+    int speep_idx = ui->ss_speeds_cbox->currentIndex();
+    m_products[product_idx].params[speep_idx].color = text.toInt();
     ui->ss_colorfactor_ledit->setStyleSheet("border: 1px solid red;");
-    ui->ss_profile_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
+    ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
 
-void MainWindow::on_ss_unit_cbox_currentIndexChanged(int idx)
+void MainWindow::on_ss_product_edit_btn_clicked()
 {
-    switch(idx) {
-        case eUNIT_MM:
-        {
-            m_profiles[idx].unittype = eUNIT_MM;
-        }
-        break;
+    ui->ins_input_text_ledit->setText(ui->ss_products_cbox->currentText());
+    ui->ins_item_name_lbl->setText(ui->ss_products_lbl->text());
+    ui->stackedWidget->setCurrentIndex(eINPUT_TEXT_SCREEN);
+}
 
-        case eUNIT_CM:
-        {
-            m_profiles[idx].unittype = eUNIT_CM;
-        }
-        break;
-
-        case eUNIT_INCH:
-        {
-            m_profiles[idx].unittype = eUNIT_INCH;
-        }
-        break;
-
-        default:
-        {
-            qDebug()<<"Unknown diameter unit type";
-        }
-        break;
+void MainWindow::on_ins_input_text_ledit_returnPressed()
+{
+    if ( ! ui->ins_item_name_lbl->text().compare(ui->ss_products_lbl->text()) ) {
+        ui->ss_products_cbox->setItemText(ui->ss_products_cbox->currentIndex(), ui->ins_input_text_ledit->text());
+        productBtngrp.buttons().at(ui->ss_products_cbox->currentIndex())->setText(ui->ins_input_text_ledit->text());
+    } else if ( ! ui->ins_item_name_lbl->text().compare(ui->ss_speeds_lbl->text()) ) {
+        ui->ss_speeds_cbox->setItemText(ui->ss_speeds_cbox->currentIndex(), ui->ins_input_text_ledit->text());
+        speedBtngrp.buttons().at(ui->ss_speeds_cbox->currentIndex())->setText(ui->ins_input_text_ledit->text());
     }
+    ui->ins_input_text_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
+    ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
+}
+
+void MainWindow::on_ins_back_btn_clicked()
+{
+    ui->ss_products_cbox->setItemText(ui->ss_products_cbox->currentIndex(), ui->ins_input_text_ledit->text());
+    ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
+}
+
+void MainWindow::on_ins_input_text_ledit_textEdited(const QString &text)
+{
+    (void)text;
+    ui->ins_input_text_ledit->setStyleSheet("border: 1px solid red; background-color: #222b2e; color: #d3dae3;");
+    ui->ins_input_save_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red;");
+}
+
+void MainWindow::on_ss_speed_edit_btn_clicked()
+{
+    ui->ins_input_text_ledit->setText(ui->ss_speeds_cbox->currentText());
+    ui->ins_item_name_lbl->setText(ui->ss_speeds_lbl->text());
+    ui->stackedWidget->setCurrentIndex(eINPUT_TEXT_SCREEN);
+}
+
+void MainWindow::on_ss_products_cbox_currentIndexChanged(int product_idx)
+{
+    if (product_idx > MAX_PRODUCT_PARAMS_COUNT) {
+        return;
+    }
+    int speed_idx = ui->ss_speeds_cbox->currentIndex();
+    ui->ss_maxerpm_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].erpm));
+    ui->ss_crpmfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].crpm));
+    ui->ss_colorfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].color));
+}
+
+void MainWindow::on_ss_speeds_cbox_currentIndexChanged(int speed_idx)
+{
+    if (speed_idx > MAX_SPEED_PARAMS_COUNT) {
+        return;
+    }
+    int product_idx = ui->ss_products_cbox->currentIndex();
+    ui->ss_maxerpm_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].erpm));
+    ui->ss_crpmfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].crpm));
+    ui->ss_colorfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].color));
+}
+
+void MainWindow::on_ins_input_save_btn_clicked()
+{
+    if ( ! ui->ins_item_name_lbl->text().compare(ui->ss_products_lbl->text()) ) {
+        ui->ss_products_cbox->setItemText(ui->ss_products_cbox->currentIndex(), ui->ins_input_text_ledit->text());
+        productBtngrp.buttons().at(ui->ss_products_cbox->currentIndex())->setText(ui->ins_input_text_ledit->text());
+    } else if ( ! ui->ins_item_name_lbl->text().compare(ui->ss_speeds_lbl->text()) ) {
+        ui->ss_speeds_cbox->setItemText(ui->ss_speeds_cbox->currentIndex(), ui->ins_input_text_ledit->text());
+        speedBtngrp.buttons().at(ui->ss_speeds_cbox->currentIndex())->setText(ui->ins_input_text_ledit->text());
+    }
+    ui->ins_input_text_ledit->setStyleSheet("border: 1px solid #4fa08b; background-color: #222b2e; color: #d3dae3;");
+    ui->ins_input_save_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid #4fa08b;");
+    ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
 }
 
