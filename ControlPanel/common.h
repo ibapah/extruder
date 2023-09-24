@@ -4,6 +4,9 @@
 
 #define MAX_PRODUCT_PARAMS_COUNT      3
 #define MAX_SPEED_PARAMS_COUNT        5
+#define SYSTEM_SETTINGS_FILE "./settings.bin"
+
+#pragma pack(1)
 
 enum SpeedProfiles {
     eSPEED_ONE = 0,
@@ -26,7 +29,6 @@ enum ControlPanelScreens {
     eUNKWON_SCREEN
 };
 
-
 struct SpeedParams
 {
     int erpm;
@@ -38,4 +40,12 @@ struct ProductParams
 {
     char name[32];
     SpeedParams params[MAX_SPEED_PARAMS_COUNT];
+};
+
+struct ControlPanelConfig
+{
+    bool link_state;
+    int product_idx;
+    int speed_idx;
+    struct ProductParams m_products[MAX_PRODUCT_PARAMS_COUNT];
 };

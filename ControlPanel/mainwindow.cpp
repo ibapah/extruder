@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QQueue>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,13 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->product5_rbtn->hide();
 
     e_run_state = eSTATE_STOPPED;
-    ui->extruder_lcd->display(f_extruder_rpm);
-    ui->caterpillar_lcd->display(f_caterpillar_rpm);
-    ui->stepper_lcd->display(f_stepper_pps);
-    ui->speed1_rbtn->setChecked(true);
-    ui->product1_rbtn->setChecked(true);
-
-    on_linkbtn_clicked();
 
     QList<QRadioButton *> productButtons = ui->products_grpbox->findChildren<QRadioButton *>();
     for(int i = 0; i < productButtons.size(); ++i) {
@@ -44,37 +38,105 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&productBtngrp, SIGNAL(buttonClicked(int)), this, SLOT(on_productBtngrpButtonClicked(int)) );
     connect(&speedBtngrp, SIGNAL(buttonClicked(int)), this, SLOT(on_speedBtngrpButtonClicked(int)) );
 
-    // init with dummy values
-    strcpy(m_products[0].name, "1.25 inch");
-    strcpy(m_products[1].name, "13/16 mm");
-    strcpy(m_products[2].name, "2 inch");
-    for (int i=0; i<MAX_PRODUCT_PARAMS_COUNT; i++) {
-        for(int j=0; j<MAX_SPEED_PARAMS_COUNT; j++) {
-            m_products[i].params[j].erpm = ((i+1)*(j+1)+2)*100;
-            m_products[i].params[j].crpm = ((i+1)*(j+1)+2)*50;
-            m_products[i].params[j].color = (float)4.6+((i+1)*(j+1)+1.0);
-            //qDebug()<<i<<":"<<j<<"["<<m_products[i].params[j].erpm<<","<<m_products[i].params[j].crpm<<","<<m_products[i].params[j].color<<"]";
-        }
+    initSystemSettings();
+
+    processLinkState();
+    if ( m_cpanel_conf_ptr->link_state ) {
+        ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+        ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+        ui->stepper_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
     }
+    speedBtngrp.buttons().at(m_cpanel_conf_ptr->speed_idx)->setChecked(true);
+    productBtngrp.buttons().at(m_cpanel_conf_ptr->product_idx)->setChecked(true);
 
     return;
 }
 
 MainWindow::~MainWindow()
 {
-
+    if (m_conf_mmap_addr) {
+        munmap(m_conf_mmap_addr, m_conf_file_size);
+        m_conf_mmap_addr = nullptr;
+    }
+    QThread::sleep(1);
 }
 
-void MainWindow::on_linkbtn_clicked()
+int MainWindow::createInitialSystemConfig(void)
 {
-    if (b_link) {
-        b_link = false;
+    if (m_cpanel_conf_ptr) {
+        m_cpanel_conf_ptr->link_state = false;
+        m_cpanel_conf_ptr->product_idx= 0;
+        m_cpanel_conf_ptr->speed_idx = 0;
+        strcpy(m_cpanel_conf_ptr->m_products[0].name, "1.25 inch");
+        strcpy(m_cpanel_conf_ptr->m_products[1].name, "13/16 mm");
+        strcpy(m_cpanel_conf_ptr->m_products[2].name, "2 inch");
+        for (int i=0; i<MAX_PRODUCT_PARAMS_COUNT; i++) {
+            for(int j=0; j<MAX_SPEED_PARAMS_COUNT; j++) {
+                m_cpanel_conf_ptr->m_products[i].params[j].erpm = ((i+1)*(j+1)+2)*100;
+                m_cpanel_conf_ptr->m_products[i].params[j].crpm = ((i+1)*(j+1)+2)*50;
+                m_cpanel_conf_ptr->m_products[i].params[j].color = (float)4.6+((i+1)*(j+1)+1.0);
+            }
+        }
+    } else {
+        qDebug()<<"Failed to create initial sstem config!!!";
+        return -1;
+    }
+
+    return 0;
+}
+
+int MainWindow::initSystemSettings(void)
+{
+    bool init_default_sys_config = false;
+
+    m_cpanel_config_file.setFileName(SYSTEM_SETTINGS_FILE);
+    QFileInfo check_file(SYSTEM_SETTINGS_FILE);
+    if ( ! check_file.exists() ) {
+        // create control panel config file
+
+        if (!m_cpanel_config_file.open(QIODevice::WriteOnly)) {
+            qDebug() << "Failed to create and open the controlpanel settings file";
+            return -1;
+        }
+        m_cpanel_config_file.resize( sizeof(struct ControlPanelConfig) + 32);
+        QDataStream out(&m_cpanel_config_file);
+        QByteArray data(m_cpanel_config_file.size(), '\0');
+        out.writeRawData(data.constData(), data.size());
+        m_cpanel_config_file.close();
+        qDebug() << "New controlpanel settings file created.";
+        init_default_sys_config = true;
+    }
+
+    if (!m_cpanel_config_file.open(QIODevice::ReadWrite)) {
+        qDebug() << "Failed to open the controlpanel settings file";
+        return -1;
+    }
+    m_conf_file_size = m_cpanel_config_file.size();
+    // Map the file into memory
+    int fd = m_cpanel_config_file.handle();
+    m_conf_mmap_addr = mmap(nullptr, m_cpanel_config_file.size(), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    if (m_conf_mmap_addr == MAP_FAILED) {
+        m_cpanel_config_file.close();
+        qDebug() << "controlpanel settings mapping failed!!!";
+        return -1;
+    }
+
+    m_cpanel_conf_ptr = static_cast<struct ControlPanelConfig *>(m_conf_mmap_addr);
+
+    if (init_default_sys_config) {
+        createInitialSystemConfig();
+    }
+
+    return 0;
+}
+
+void MainWindow::processLinkState(void)
+{
+    if (m_cpanel_conf_ptr->link_state) {
         // set values
-        int product_idx = productBtngrp.checkedId();
-        int speed_idx = speedBtngrp.checkedId();
-        ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
-        ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
-        ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
+        ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+        ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+        ui->stepper_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
         ui->hline1->show();
         ui->hline2->show();
         ui->hline3->show();
@@ -83,7 +145,10 @@ void MainWindow::on_linkbtn_clicked()
         ui->vline2->show();
         ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); background-color : rgb(63, 73, 127); border: 3px solid rgb(39, 55, 77);");
     } else {
-        b_link = true;
+        // clear values
+        ui->extruder_lcd->display("0000");
+        ui->caterpillar_lcd->display("0000");
+        ui->stepper_lcd->display("0.0");
         ui->hline1->hide();
         ui->hline2->hide();
         ui->hline3->hide();
@@ -94,40 +159,52 @@ void MainWindow::on_linkbtn_clicked()
     }
 }
 
+void MainWindow::on_linkbtn_clicked()
+{
+    m_cpanel_conf_ptr->link_state = !m_cpanel_conf_ptr->link_state;
+    processLinkState();
+}
+
 void MainWindow::on_extruder_up_btn_clicked()
 {
-    f_extruder_rpm += 1;
-    ui->extruder_lcd->display(f_extruder_rpm);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->extruder_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+    }
 }
 
 void MainWindow::on_extruder_down_btn_clicked()
 {
-    f_extruder_rpm -= 1;
-    ui->extruder_lcd->display(f_extruder_rpm);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->extruder_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+    }
 }
 
 void MainWindow::on_caterpillar_up_btn_clicked()
 {
-    f_caterpillar_rpm += 1;
-    ui->caterpillar_lcd->display(f_caterpillar_rpm);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->caterpillar_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+    }
 }
 
 void MainWindow::on_caterpillar_down_btn_clicked()
 {
-    f_caterpillar_rpm -= 1;
-    ui->caterpillar_lcd->display(f_caterpillar_rpm);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->caterpillar_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+    }
 }
 
 void MainWindow::on_stepper_up_btn_clicked()
 {
-    f_stepper_pps += 1;
-    ui->stepper_lcd->display(f_stepper_pps);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->stepper_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
+    }
 }
 
 void MainWindow::on_stepper_down_btn_clicked()
 {
-    f_stepper_pps -= 1;
-    ui->stepper_lcd->display(f_stepper_pps);
+    if (m_cpanel_conf_ptr->link_state) {
+        ui->stepper_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
+    }
 }
 
 void MainWindow::on_settings_btn_clicked()
@@ -148,22 +225,26 @@ void MainWindow::on_ss_back_btn_clicked()
 
 void MainWindow::on_productBtngrpButtonClicked(int product_idx)
 {
-    if (b_link)
-        return;
-    int speed_idx = speedBtngrp.checkedId();
-    ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
-    ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
-    ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
+    m_cpanel_conf_ptr->product_idx = product_idx;
+    m_cpanel_conf_ptr->speed_idx = speedBtngrp.checkedId();
+
+    if ( m_cpanel_conf_ptr->link_state ) {
+        ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+        ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+        ui->stepper_lcd->display(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
+    }
 }
 
 void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
 {
-    if (b_link)
-        return;
-    int product_idx = productBtngrp.checkedId();
-    ui->extruder_lcd->display(m_products[product_idx].params[speed_idx].erpm);
-    ui->caterpillar_lcd->display(m_products[product_idx].params[speed_idx].crpm);
-    ui->stepper_lcd->display(m_products[product_idx].params[speed_idx].color);
+    m_cpanel_conf_ptr->speed_idx = speed_idx;
+    m_cpanel_conf_ptr->product_idx = productBtngrp.checkedId();
+
+    if ( m_cpanel_conf_ptr->link_state ) {
+        ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].erpm);
+        ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].crpm);
+        ui->stepper_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].color);
+    }
 }
 
 void MainWindow::on_run_btn_clicked()
@@ -195,9 +276,9 @@ void MainWindow::on_ss_params_editsave_btn_clicked()
         ss_profile_edit = false;
         int speep_idx = ui->ss_speeds_cbox->currentIndex();
         int product_idx = ui->ss_products_cbox->currentIndex();
-        m_products[product_idx].params[speep_idx].erpm = ui->ss_maxerpm_ledit->text().toInt();
-        m_products[product_idx].params[speep_idx].crpm = ui->ss_crpmfactor_ledit->text().toInt();
-        m_products[product_idx].params[speep_idx].color = ui->ss_colorfactor_ledit->text().toFloat();
+        m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].erpm = ui->ss_maxerpm_ledit->text().toInt();
+        m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].crpm = ui->ss_crpmfactor_ledit->text().toInt();
+        m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].color = ui->ss_colorfactor_ledit->text().toFloat();
 
         ui->ss_maxerpm_ledit->setReadOnly(true);
         ui->ss_crpmfactor_ledit->setReadOnly(true);
@@ -213,7 +294,7 @@ void MainWindow::on_ss_maxerpm_ledit_textEdited(const QString &text)
 {
     int product_idx = ui->ss_products_cbox->currentIndex();
     int speep_idx = ui->ss_speeds_cbox->currentIndex();
-    m_products[product_idx].params[speep_idx].erpm = text.toInt();
+    m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].erpm = text.toInt();
     ui->ss_maxerpm_ledit->setStyleSheet("border: 1px solid red;");
     ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
@@ -222,7 +303,7 @@ void MainWindow::on_ss_crpmfactor_ledit_textEdited(const QString &text)
 {
     int product_idx = ui->ss_products_cbox->currentIndex();
     int speep_idx = ui->ss_speeds_cbox->currentIndex();
-    m_products[product_idx].params[speep_idx].crpm = text.toInt();
+    m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].crpm = text.toInt();
     ui->ss_crpmfactor_ledit->setStyleSheet("border: 1px solid red;");
     ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
@@ -231,7 +312,7 @@ void MainWindow::on_ss_colorfactor_ledit_textEdited(const QString &text)
 {    
     int product_idx = ui->ss_products_cbox->currentIndex();
     int speep_idx = ui->ss_speeds_cbox->currentIndex();
-    m_products[product_idx].params[speep_idx].color = text.toInt();
+    m_cpanel_conf_ptr->m_products[product_idx].params[speep_idx].color = text.toInt();
     ui->ss_colorfactor_ledit->setStyleSheet("border: 1px solid red;");
     ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid red; background-color: #222b2e;");
 }
@@ -282,9 +363,9 @@ void MainWindow::on_ss_products_cbox_currentIndexChanged(int product_idx)
         return;
     }
     int speed_idx = ui->ss_speeds_cbox->currentIndex();
-    ui->ss_maxerpm_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].erpm));
-    ui->ss_crpmfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].crpm));
-    ui->ss_colorfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].color));
+    ui->ss_maxerpm_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].erpm));
+    ui->ss_crpmfactor_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].crpm));
+    ui->ss_colorfactor_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].color));
 }
 
 void MainWindow::on_ss_speeds_cbox_currentIndexChanged(int speed_idx)
@@ -293,9 +374,9 @@ void MainWindow::on_ss_speeds_cbox_currentIndexChanged(int speed_idx)
         return;
     }
     int product_idx = ui->ss_products_cbox->currentIndex();
-    ui->ss_maxerpm_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].erpm));
-    ui->ss_crpmfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].crpm));
-    ui->ss_colorfactor_ledit->setText(QString::number(m_products[product_idx].params[speed_idx].color));
+    ui->ss_maxerpm_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].erpm));
+    ui->ss_crpmfactor_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].crpm));
+    ui->ss_colorfactor_ledit->setText(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[speed_idx].color));
 }
 
 void MainWindow::on_ins_input_save_btn_clicked()

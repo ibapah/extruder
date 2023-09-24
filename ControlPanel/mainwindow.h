@@ -6,6 +6,9 @@
 #include <QLabel>
 #include <QElapsedTimer>
 #include <QButtonGroup>
+#include <QFile>
+#include <sys/mman.h>
+#include <unistd.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +21,9 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    int createInitialSystemConfig(void);
+    int initSystemSettings(void);
+    void processLinkState(void);
 public slots:
 
 protected:
@@ -54,12 +60,11 @@ public slots:
 private:
     Ui::MainWindow *ui;
     enum RunStates e_run_state;
-    float f_extruder_rpm = 1000.0;
-    float f_caterpillar_rpm = 500.0;
-    float f_stepper_pps = 1.1;
-    bool b_link = false;
     bool ss_profile_edit = false;
     QButtonGroup productBtngrp;
     QButtonGroup speedBtngrp;
-    struct ProductParams m_products[MAX_PRODUCT_PARAMS_COUNT];
+    QFile m_cpanel_config_file;
+    int m_conf_file_size = 0;
+    void *m_conf_mmap_addr = nullptr;
+    struct ControlPanelConfig *m_cpanel_conf_ptr = nullptr;
 };
