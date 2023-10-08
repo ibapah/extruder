@@ -71,6 +71,12 @@ MainWindow::~MainWindow()
     QThread::sleep(1);
 }
 
+/*****************************************************************
+* Initialize the IO board stacked to the rpi *
+* This function finds and initialize the industrial IO board*
+*****************************************************************/
+/* 09/10/2023, rev-05 */
+/* Called by : Mainwindow constructor*/
 int MainWindow::initialize_io_board(void)
 {
     // Init first io board
@@ -291,6 +297,12 @@ void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
     }
 }
 
+/*****************************************************************
+* Set the analog output voltage for ERPM and CRPM on start condition*
+* It set the voltage for channel 1 & 2 based on the extruder and caterpillar RPMs in the UI *
+*****************************************************************/
+/* 09/10/2023, rev-05 */
+/* Called by : on_run_btn_clicked*/
 int MainWindow::setStartVoltages(void)
 {
     float volt = 0.0;
@@ -321,6 +333,12 @@ int MainWindow::setStartVoltages(void)
     return 0;
 }
 
+/*****************************************************************
+* Set the analog output voltage for ERPM and CRPM on stop condition*
+* The extruder and caterpillar voltages set to 0.0 for the stop *
+*****************************************************************/
+/* 09/10/2023, rev-05 */
+/* Called by : on_run_btn_clicked*/
 int MainWindow::setStopVoltages(void)
 {
     float volt = 0.0;
