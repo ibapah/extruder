@@ -8,6 +8,11 @@
 #include <QQueue>
 #include <QFileInfo>
 
+#include "megaind.h"
+#include "rs485.h"
+#include "dout.h"
+#include "analog.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -49,6 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
     speedBtngrp.buttons().at(m_cpanel_conf_ptr->speed_idx)->setChecked(true);
     productBtngrp.buttons().at(m_cpanel_conf_ptr->product_idx)->setChecked(true);
 
+    // check and init IO board
+    if ( 0 != initialize_io_board() ) {
+        return;
+    }
+
     return;
 }
 
@@ -59,6 +69,40 @@ MainWindow::~MainWindow()
         m_conf_mmap_addr = nullptr;
     }
     QThread::sleep(1);
+}
+
+int MainWindow::initialize_io_board(void)
+{
+    // Init first io board
+    m_dev = doBoardInit(0);
+    if (m_dev <= 0) {
+        qDebug()<<"ERROR: Failed to find and init IO board!!!";
+        return -1;
+    }
+
+    u32 baud = 9600;
+    u8 mode = 1, stopB = 1, parity = 0, address = 1;
+    // to setup 0-10V_OUT_1
+    if ( 0 != rs485Set(m_dev, mode, baud, stopB, parity, address) ) {
+        qDebug()<<"ERROR: Failed to set modbus 0-10V_OUT_1!!!";
+        return -1;
+    }
+
+    // to setup 0-10V_OUT_2
+    address = 2;
+    if ( 0 != rs485Set(m_dev, mode, baud, stopB, parity, address) ) {
+        qDebug()<<"ERROR: Failed to set modbus 0-10V_OUT_2!!!";
+        return -1;
+    }
+
+    // to setup OPEN_DRAIN_1
+    int ch = 1;
+    if ( 0 != openDrainSet(m_dev, ch) ) {
+        qDebug()<<"ERROR: Failed to set OPEN_DRAIN_1";
+        return -1;
+    }
+
+    return 0;
 }
 
 int MainWindow::createInitialSystemConfig(void)
@@ -247,20 +291,72 @@ void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
     }
 }
 
+int MainWindow::setStartVoltages(void)
+{
+    float volt = 0.0;
+
+    if (m_dev == -1 ) {
+        qDebug()<<"ERROR: the IO board not initialized yet!!!";
+        return -1;
+    }
+
+    // For erpm
+    int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
+    volt = (erpm / RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
+     // Channel 1 for erpm
+    if ( 0 != analogOutVoltageWrite(m_dev, 1, volt) ) {
+        qDebug()<<"ERROR: failed to set voltage for erpm!!!";
+        return -1;
+    }
+
+    // For crpm
+    int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
+    volt = (crpm / RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
+    // Channel 2 for crpm
+    if ( 0 != analogOutVoltageWrite(m_dev, 2, volt) ) {
+        qDebug()<<"ERROR: failed to set voltage for crpm!!!";
+        return -1;
+    }
+
+    return 0;
+}
+
+int MainWindow::setStopVoltages(void)
+{
+    float volt = 0.0;
+
+    if (m_dev == -1 ) {
+        qDebug()<<"ERROR: the IO board not initialized yet!!!";
+        return -1;
+    }
+
+    // For erpm
+    analogOutVoltageWrite(m_dev, 1, volt); // Channel 1 for erpm
+
+    // For crpm
+    analogOutVoltageWrite(m_dev, 2, volt); // Channel 2 for crpm
+
+    return 0;
+}
+
 void MainWindow::on_run_btn_clicked()
 {
     if ( ! ui->run_btn->text().compare("START") ) {
-        e_run_state = eSTATE_STOPPED;
-        ui->products_grpbox->setEnabled(false);
-        ui->speeds_grpbox->setEnabled(false);
-        ui->run_btn->setText("STOP");
-        ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
+        if ( 0 == setStopVoltages() ) {
+            e_run_state = eSTATE_STOPPED;
+            ui->products_grpbox->setEnabled(false);
+            ui->speeds_grpbox->setEnabled(false);
+            ui->run_btn->setText("STOP");
+            ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
+        }
     } else {
-        e_run_state = eSTATE_STARTED;
-        ui->products_grpbox->setEnabled(true);
-        ui->speeds_grpbox->setEnabled(true);
-        ui->run_btn->setText("START");
-        ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
+        if ( 0 == setStartVoltages() ) {
+            e_run_state = eSTATE_STARTED;
+            ui->products_grpbox->setEnabled(true);
+            ui->speeds_grpbox->setEnabled(true);
+            ui->run_btn->setText("START");
+            ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
+        }
     }
 }
 

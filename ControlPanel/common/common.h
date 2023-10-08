@@ -2,8 +2,10 @@
 
 #include <stdbool.h>
 
-#define MAX_PRODUCT_PARAMS_COUNT      3
-#define MAX_SPEED_PARAMS_COUNT        5
+#define MAX_PRODUCT_PARAMS_COUNT        3
+#define MAX_SPEED_PARAMS_COUNT          5
+#define RPM_TO_VOLTAGEE_DIVIDE_FACTOR   150
+
 #define SYSTEM_SETTINGS_FILE "./settings.bin"
 
 #pragma pack(1)

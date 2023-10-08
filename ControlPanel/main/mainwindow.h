@@ -24,6 +24,10 @@ public:
     int createInitialSystemConfig(void);
     int initSystemSettings(void);
     void processLinkState(void);
+    int initialize_io_board(void);
+    int setStartVoltages(void);
+    int setStopVoltages(void);
+
 public slots:
 
 protected:
@@ -59,6 +63,7 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+    int m_dev = -1;
     enum RunStates e_run_state;
     bool ss_profile_edit = false;
     QButtonGroup productBtngrp;
