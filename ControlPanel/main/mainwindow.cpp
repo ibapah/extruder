@@ -54,11 +54,19 @@ MainWindow::MainWindow(QWidget *parent)
     speedBtngrp.buttons().at(m_cpanel_conf_ptr->speed_idx)->setChecked(true);
     productBtngrp.buttons().at(m_cpanel_conf_ptr->product_idx)->setChecked(true);
 
+    connect(&m_erpm_up_press_timer, SIGNAL(timeout()), this, SLOT(handleERPMIncrement()));
+    connect(&m_erpm_down_press_timer, SIGNAL(timeout()), this, SLOT(handleERPMDecrement()));
+    connect(&m_crpm_up_press_timer, SIGNAL(timeout()), this, SLOT(handleCRPMIncrement()));
+    connect(&m_crpm_down_press_timer, SIGNAL(timeout()), this, SLOT(handleCRPMDecrement()));
+    connect(&m_color_up_press_timer, SIGNAL(timeout()), this, SLOT(handleColorIncrement()));
+    connect(&m_color_down_press_timer, SIGNAL(timeout()), this, SLOT(handleColorDecrement()));
+
+#ifdef __arm__
     // check and init IO board
     if ( 0 != initialize_io_board() ) {
         return;
     }
-
+#endif
     return;
 }
 
@@ -195,10 +203,6 @@ void MainWindow::processLinkState(void)
         ui->vline2->show();
         ui->linkbtn->setStyleSheet("image: url(:/icons/link.svg); background-color : rgb(63, 73, 127); border: 3px solid rgb(39, 55, 77);");
     } else {
-        // clear values
-        ui->extruder_lcd->display("0000");
-        ui->caterpillar_lcd->display("0000");
-        ui->stepper_lcd->display("0.0");
         ui->hline1->hide();
         ui->hline2->hide();
         ui->hline3->hide();
@@ -217,44 +221,36 @@ void MainWindow::on_linkbtn_clicked()
 
 void MainWindow::on_extruder_up_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->extruder_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
-    }
+    ui->extruder_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+    setStartVoltages(eERPM);
 }
 
 void MainWindow::on_extruder_down_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->extruder_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
-    }
+    ui->extruder_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
+    setStartVoltages(eERPM);
 }
 
 void MainWindow::on_caterpillar_up_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->caterpillar_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
-    }
+    ui->caterpillar_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+    setStartVoltages(eCRPM);
 }
 
 void MainWindow::on_caterpillar_down_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->caterpillar_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
-    }
+    ui->caterpillar_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+    setStartVoltages(eCRPM);
 }
 
 void MainWindow::on_stepper_up_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->stepper_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
-    }
+    ui->stepper_lcd->display(++m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
 }
 
 void MainWindow::on_stepper_down_btn_clicked()
 {
-    if (m_cpanel_conf_ptr->link_state) {
-        ui->stepper_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
-    }
+    ui->stepper_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color);
 }
 
 void MainWindow::on_settings_btn_clicked()
@@ -303,31 +299,41 @@ void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
 *****************************************************************/
 /* 09/10/2023, rev-05 */
 /* Called by : on_run_btn_clicked*/
-int MainWindow::setStartVoltages(void)
+int MainWindow::setStartVoltages(enum ParameterTypes type)
 {
     float volt = 0.0;
-
+#ifdef __arm__
     if (m_dev == -1 ) {
         qDebug()<<"ERROR: the IO board not initialized yet!!!";
         return -1;
     }
-
-    // For erpm
-    int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
-    volt = (erpm / RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
-     // Channel 1 for erpm
-    if ( 0 != analogOutVoltageWrite(m_dev, 1, volt) ) {
-        qDebug()<<"ERROR: failed to set voltage for erpm!!!";
-        return -1;
+#endif
+    if ( (type == eERPM) || (type == eALL_PARAMS) ) {
+        // For erpm
+        int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
+        volt = (float)((float)erpm / (float)RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
+#ifdef __arm__
+        // Channel 1 for erpm
+        if ( 0 != analogOutVoltageWrite(m_dev, 1, volt) ) {
+            qDebug()<<"ERROR: failed to set voltage for erpm!!!";
+            return -1;
+        }
+#endif
+        ui->erpm_volt->setText("erpm: " + QString::number(volt) + "V");
     }
 
-    // For crpm
-    int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
-    volt = (crpm / RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
-    // Channel 2 for crpm
-    if ( 0 != analogOutVoltageWrite(m_dev, 2, volt) ) {
-        qDebug()<<"ERROR: failed to set voltage for crpm!!!";
-        return -1;
+    if ( (type == eCRPM) || (type == eALL_PARAMS) ) {
+        // For crpm
+        int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
+        volt = (float)((float)crpm / (float)RPM_TO_VOLTAGEE_DIVIDE_FACTOR);
+#ifdef __arm__
+        // Channel 2 for crpm
+        if ( 0 != analogOutVoltageWrite(m_dev, 2, volt) ) {
+            qDebug()<<"ERROR: failed to set voltage for crpm!!!";
+            return -1;
+        }
+#endif
+        ui->crpm_volt->setText("crpm: " + QString::number(volt) + "V");
     }
 
     return 0;
@@ -343,6 +349,7 @@ int MainWindow::setStopVoltages(void)
 {
     float volt = 0.0;
 
+#ifdef __arm__
     if (m_dev == -1 ) {
         qDebug()<<"ERROR: the IO board not initialized yet!!!";
         return -1;
@@ -353,25 +360,25 @@ int MainWindow::setStopVoltages(void)
 
     // For crpm
     analogOutVoltageWrite(m_dev, 2, volt); // Channel 2 for crpm
-
+#endif
     return 0;
 }
 
 void MainWindow::on_run_btn_clicked()
 {
-    if ( ! ui->run_btn->text().compare("START") ) {
-        if ( 0 == setStopVoltages() ) {
-            e_run_state = eSTATE_STOPPED;
-            ui->products_grpbox->setEnabled(false);
-            ui->speeds_grpbox->setEnabled(false);
+    if ( ui->run_btn->text().compare("START") == 0 ) {
+        if ( 0 == setStartVoltages(eALL_PARAMS) ) {
+            e_run_state = eSTATE_STARTED;
+            ui->products_grpbox->setEnabled(true);
+            ui->speeds_grpbox->setEnabled(true);
             ui->run_btn->setText("STOP");
             ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
         }
     } else {
-        if ( 0 == setStartVoltages() ) {
-            e_run_state = eSTATE_STARTED;
-            ui->products_grpbox->setEnabled(true);
-            ui->speeds_grpbox->setEnabled(true);
+        if ( 0 == setStopVoltages() ) {
+            e_run_state = eSTATE_STOPPED;
+            ui->products_grpbox->setEnabled(false);
+            ui->speeds_grpbox->setEnabled(false);
             ui->run_btn->setText("START");
             ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
         }
@@ -507,3 +514,146 @@ void MainWindow::on_ins_input_save_btn_clicked()
     ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
 }
 
+void MainWindow::handleERPMIncrement(void)
+{
+    int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
+    erpm += m_long_press_factor * 10;
+    if ( m_long_press_factor < 10 )
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
+    ui->extruder_lcd->display(erpm);
+    setStartVoltages(eERPM);
+}
+
+void MainWindow::handleERPMDecrement(void)
+{
+    int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
+    erpm -= m_long_press_factor * 10;
+    if ( m_long_press_factor < 10 )
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
+    ui->extruder_lcd->display(erpm);
+    setStartVoltages(eERPM);
+}
+
+void MainWindow::handleCRPMIncrement(void)
+{
+    int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
+    crpm += m_long_press_factor * 10;
+    if ( m_long_press_factor < 10 )
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
+    ui->caterpillar_lcd->display(crpm);
+    setStartVoltages(eCRPM);
+}
+
+void MainWindow::handleCRPMDecrement(void)
+{
+    ui->caterpillar_lcd->display(--m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
+    int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
+    crpm -= m_long_press_factor * 10;
+    if ( m_long_press_factor < 10 )
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
+    ui->caterpillar_lcd->display(crpm);
+    setStartVoltages(eCRPM);
+}
+
+void MainWindow::handleColorIncrement(void)
+{
+    float color = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color;
+    color += (float)m_long_press_factor * 1.0;
+    if (m_long_press_factor < 10)
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color = color;
+    ui->stepper_lcd->display(color);
+
+}
+
+void MainWindow::handleColorDecrement(void)
+{
+    float color = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color;
+    color -= (float)m_long_press_factor * 1.0;
+    if (m_long_press_factor < 10)
+        ++m_long_press_factor;
+    m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color = color;
+    ui->stepper_lcd->display(color);
+}
+
+void MainWindow::on_extruder_up_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_erpm_up_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_extruder_up_btn_released()
+{
+    if (m_erpm_up_press_timer.isActive()) {
+        m_erpm_up_press_timer.stop();
+    }
+}
+
+void MainWindow::on_extruder_down_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_erpm_down_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_extruder_down_btn_released()
+{
+    if (m_erpm_down_press_timer.isActive()) {
+        m_erpm_down_press_timer.stop();
+    }
+}
+
+void MainWindow::on_caterpillar_up_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_crpm_up_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_caterpillar_up_btn_released()
+{
+    if (m_crpm_up_press_timer.isActive()) {
+        m_crpm_up_press_timer.stop();
+    }
+}
+
+void MainWindow::on_caterpillar_down_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_crpm_down_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_caterpillar_down_btn_released()
+{
+    if (m_crpm_down_press_timer.isActive()) {
+        m_crpm_down_press_timer.stop();
+    }
+}
+
+void MainWindow::on_stepper_up_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_color_up_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_stepper_up_btn_released()
+{
+    if (m_color_up_press_timer.isActive()) {
+        m_color_up_press_timer.stop();
+    }
+}
+
+void MainWindow::on_stepper_down_btn_pressed()
+{
+    m_long_press_factor = 1;
+    m_color_down_press_timer.start(1000); // 1 sec
+}
+
+void MainWindow::on_stepper_down_btn_released()
+{
+    if (m_color_down_press_timer.isActive()) {
+        m_color_down_press_timer.stop();
+    }
+}

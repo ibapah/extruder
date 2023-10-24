@@ -980,6 +980,42 @@ border: 3px solid rgb(39, 55, 77);</string>
             <string/>
            </property>
           </widget>
+          <widget class="QLabel" name="erpm_volt">
+           <property name="geometry">
+            <rect>
+             <x>650</x>
+             <y>110</y>
+             <width>181</width>
+             <height>61</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>erpm : 0.0V</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="crpm_volt">
+           <property name="geometry">
+            <rect>
+             <x>650</x>
+             <y>420</y>
+             <width>181</width>
+             <height>61</height>
+            </rect>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>18</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>crpm : 0.0V</string>
+           </property>
+          </widget>
          </widget>
         </item>
        </layout>

@@ -31,6 +31,13 @@ enum ControlPanelScreens {
     eUNKWON_SCREEN
 };
 
+enum ParameterTypes {
+    eERPM = 0,
+    eCRPM,
+    eCOLOR,
+    eALL_PARAMS
+};
+
 struct SpeedParams
 {
     int erpm;

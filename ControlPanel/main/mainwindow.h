@@ -25,7 +25,7 @@ public:
     int initSystemSettings(void);
     void processLinkState(void);
     int initialize_io_board(void);
-    int setStartVoltages(void);
+    int setStartVoltages(ParameterTypes type);
     int setStopVoltages(void);
 
 public slots:
@@ -54,12 +54,29 @@ private slots:
     void on_ins_input_text_ledit_textEdited(const QString &arg1);
     void on_ss_speed_edit_btn_clicked();
     void on_ss_speeds_cbox_currentIndexChanged(int index);
-
     void on_ins_input_save_btn_clicked();
+    void on_extruder_up_btn_pressed();
+    void on_extruder_down_btn_released();
+    void on_extruder_up_btn_released();
+    void on_extruder_down_btn_pressed();
+    void on_caterpillar_up_btn_pressed();
+    void on_caterpillar_down_btn_released();
+    void on_stepper_up_btn_pressed();
+    void on_stepper_up_btn_released();
+    void on_stepper_down_btn_pressed();
+    void on_stepper_down_btn_released();
+    void on_caterpillar_up_btn_released();
+    void on_caterpillar_down_btn_pressed();
 
 public slots:
     void on_productBtngrpButtonClicked(int);
     void on_speedBtngrpButtonClicked(int);
+    void handleERPMIncrement();
+    void handleERPMDecrement();
+    void handleCRPMIncrement();
+    void handleCRPMDecrement();
+    void handleColorIncrement();
+    void handleColorDecrement();
 
 private:
     Ui::MainWindow *ui;
@@ -72,4 +89,11 @@ private:
     int m_conf_file_size = 0;
     void *m_conf_mmap_addr = nullptr;
     struct ControlPanelConfig *m_cpanel_conf_ptr = nullptr;
+    int m_long_press_factor;
+    QTimer m_erpm_up_press_timer;
+    QTimer m_erpm_down_press_timer;
+    QTimer m_crpm_up_press_timer;
+    QTimer m_crpm_down_press_timer;
+    QTimer m_color_up_press_timer;
+    QTimer m_color_down_press_timer;
 };
