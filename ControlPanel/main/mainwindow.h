@@ -67,6 +67,14 @@ private slots:
     void on_stepper_down_btn_released();
     void on_caterpillar_up_btn_released();
     void on_caterpillar_down_btn_pressed();
+    void on_ss_factor_edit_btn_clicked();
+    void on_fes_back_btn_clicked();
+    void on_fes_analogfactor_editsave_btn_clicked();
+    void on_fes_analogfactor_edit_textEdited(const QString &text);
+
+    void on_fes_colorfactor_editsave_btn_clicked();
+
+    void on_fes_colorfactor_edit_textEdited(const QString &arg1);
 
 public slots:
     void on_productBtngrpButtonClicked(int);
@@ -83,6 +91,8 @@ private:
     int m_dev = -1;
     enum RunStates e_run_state;
     bool ss_profile_edit = false;
+    bool fes_analog_factor_edit = false;
+    bool fes_color_factor_edit = false;
     QButtonGroup productBtngrp;
     QButtonGroup speedBtngrp;
     QFile m_cpanel_config_file;

@@ -4,7 +4,14 @@
 
 #define MAX_PRODUCT_PARAMS_COUNT        3
 #define MAX_SPEED_PARAMS_COUNT          5
-#define RPM_TO_VOLTAGEE_DIVIDE_FACTOR   150
+#define RPM_TO_VOLTAGEE_DIVIDE_FACTOR       150
+#define COLOR_PULSES_PER_STEP_FACTOR        10
+
+#define ANALOG_VOLTAGE_MAX          10
+#define EXTRUDER_RPM_MIN            0
+#define CATERPILLAR_RPM_MIN         0
+#define STEPPER_COLOR_FACTOR_MIN    0.0
+#define STEPPER_COLOR_FACTOR_MAX    100.0
 
 #define SYSTEM_SETTINGS_FILE "./settings.bin"
 
@@ -28,6 +35,7 @@ enum ControlPanelScreens {
     eRUN_SCREEN = 0,
     eSETTINGS_SCREEN,
     eINPUT_TEXT_SCREEN,
+    eFACTORS_EDIT_SCREEN,
     eUNKWON_SCREEN
 };
 
@@ -56,5 +64,7 @@ struct ControlPanelConfig
     bool link_state;
     int product_idx;
     int speed_idx;
+    float analog_factor_value;
+    float color_factor_value;
     struct ProductParams m_products[MAX_PRODUCT_PARAMS_COUNT];
 };
