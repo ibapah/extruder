@@ -858,10 +858,7 @@ QRadioButton::indicator:unchecked {
             </rect>
            </property>
            <property name="styleSheet">
-            <string notr="true">image: url(:/icons/up.svg);
-QPushButton::focus {
-	border: 3px solid green;
-};</string>
+            <string notr="true">image: url(:/icons/up.svg);</string>
            </property>
            <property name="text">
             <string/>
@@ -983,37 +980,57 @@ border: 3px solid rgb(39, 55, 77);</string>
           <widget class="QLabel" name="erpm_volt">
            <property name="geometry">
             <rect>
-             <x>650</x>
-             <y>110</y>
-             <width>181</width>
-             <height>61</height>
+             <x>25</x>
+             <y>80</y>
+             <width>100</width>
+             <height>40</height>
             </rect>
            </property>
            <property name="font">
             <font>
              <pointsize>18</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(246, 97, 81);
+border: 3px solid white;
+border-radius: 7px;</string>
+           </property>
            <property name="text">
-            <string>erpm : 0.0V</string>
+            <string>00.00V</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
           <widget class="QLabel" name="crpm_volt">
            <property name="geometry">
             <rect>
-             <x>650</x>
-             <y>420</y>
-             <width>181</width>
-             <height>61</height>
+             <x>25</x>
+             <y>410</y>
+             <width>100</width>
+             <height>40</height>
             </rect>
            </property>
            <property name="font">
             <font>
              <pointsize>18</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">color: rgb(246, 97, 81);
+border: 3px solid white;
+border-radius: 7px;</string>
+           </property>
            <property name="text">
-            <string>crpm : 0.0V</string>
+            <string>00.00V</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </widget>

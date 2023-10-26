@@ -67,6 +67,9 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
 #endif
+    showVoltages(eERPM);
+    showVoltages(eCRPM);
+
     return;
 }
 
@@ -223,13 +226,13 @@ void MainWindow::on_linkbtn_clicked()
 
 void MainWindow::on_extruder_up_btn_clicked()
 {
+    ui->extruder_up_btn->setStyleSheet("image: url(:/icons/up.svg)");
     int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
     if ( erpm < (m_cpanel_conf_ptr->analog_factor_value * ANALOG_VOLTAGE_MAX) ) {
         ui->extruder_lcd->display(++erpm);
         m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
     }
-    setStartVoltages(eERPM);
-
+    showVoltages(eERPM);
 }
 
 void MainWindow::on_extruder_down_btn_clicked()
@@ -239,7 +242,7 @@ void MainWindow::on_extruder_down_btn_clicked()
         ui->extruder_lcd->display(--erpm);
         m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
     }
-    setStartVoltages(eERPM);
+    showVoltages(eERPM);
 }
 
 void MainWindow::on_caterpillar_up_btn_clicked()
@@ -249,7 +252,7 @@ void MainWindow::on_caterpillar_up_btn_clicked()
         ui->caterpillar_lcd->display(++crpm);
         m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
     }
-    setStartVoltages(eCRPM);
+    showVoltages(eCRPM);
 }
 
 void MainWindow::on_caterpillar_down_btn_clicked()
@@ -259,7 +262,7 @@ void MainWindow::on_caterpillar_down_btn_clicked()
         ui->caterpillar_lcd->display(--crpm);
         m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
     }
-    setStartVoltages(eCRPM);
+    showVoltages(eCRPM);
 }
 
 void MainWindow::on_stepper_up_btn_clicked()
@@ -318,6 +321,33 @@ void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
     }
 }
 
+void MainWindow::showVoltages(enum ParameterTypes type)
+{
+    float volt = 0.0;
+
+    if ( type == eERPM ) {
+        int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
+        volt = (float)((float)erpm / (float)(m_cpanel_conf_ptr->analog_factor_value));
+        QString formattedValue = QString::number(volt, 'f', 2);
+        if (e_run_state == eSTATE_STARTED) {
+            ui->erpm_volt->setStyleSheet("color: green; border: 3px solid white; border-radius: 7px;");
+        } else {
+            ui->erpm_volt->setStyleSheet("color: rgb(246, 97, 81); border: 3px solid white; border-radius: 7px;");
+        }
+        ui->erpm_volt->setText(formattedValue + "V");
+    } else {
+        int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
+        volt = (float)((float)crpm / (float)((m_cpanel_conf_ptr->analog_factor_value)));
+        QString formattedValue = QString::number(volt, 'f', 2);
+        if (e_run_state == eSTATE_STARTED) {
+            ui->crpm_volt->setStyleSheet("color: green; border: 3px solid white; border-radius: 7px;");
+        } else {
+            ui->crpm_volt->setStyleSheet("color: rgb(246, 97, 81); border: 3px solid white; border-radius: 7px;");
+        }
+        ui->crpm_volt->setText(formattedValue + "V");
+    }
+}
+
 /*****************************************************************
 * Set the analog output voltage for ERPM and CRPM on start condition*
 * It set the voltage for channel 1 & 2 based on the extruder and caterpillar RPMs in the UI *
@@ -344,7 +374,6 @@ int MainWindow::setStartVoltages(enum ParameterTypes type)
             return -1;
         }
 #endif
-        ui->erpm_volt->setText("erpm: " + QString::number(volt) + "V");
     }
 
     if ( (type == eCRPM) || (type == eALL_PARAMS) ) {
@@ -358,7 +387,7 @@ int MainWindow::setStartVoltages(enum ParameterTypes type)
             return -1;
         }
 #endif
-        ui->crpm_volt->setText("crpm: " + QString::number(volt) + "V");
+        showVoltages(eCRPM);
     }
 
     return 0;
@@ -369,7 +398,7 @@ int MainWindow::setStartVoltages(enum ParameterTypes type)
 * The extruder and caterpillar voltages set to 0.0 for the stop *
 *****************************************************************/
 /* 09/10/2023, rev-05 */
-/* Called by : on_run_btn_clicked*/
+/* Called by : on__clicked*/
 int MainWindow::setStopVoltages(void)
 {
     float volt = 0.0;
@@ -394,20 +423,36 @@ void MainWindow::on_run_btn_clicked()
     if ( ui->run_btn->text().compare("START") == 0 ) {
         if ( 0 == setStartVoltages(eALL_PARAMS) ) {
             e_run_state = eSTATE_STARTED;
-            ui->products_grpbox->setEnabled(true);
-            ui->speeds_grpbox->setEnabled(true);
+            ui->products_grpbox->setEnabled(false);
+            ui->speeds_grpbox->setEnabled(false);
+            ui->extruder_up_btn->setEnabled(false);
+            ui->extruder_down_btn->setEnabled(false);
+            ui->caterpillar_up_btn->setEnabled(false);
+            ui->caterpillar_down_btn->setEnabled(false);
+            ui->stepper_up_btn->setEnabled(false);
+            ui->stepper_down_btn->setEnabled(false);
+            ui->settings_btn->setVisible(false);
             ui->run_btn->setText("STOP");
-            ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 10px;");
+            ui->run_btn->setStyleSheet("background-color: rgb(246, 97, 81); border-radius: 30px;");
         }
     } else {
         if ( 0 == setStopVoltages() ) {
             e_run_state = eSTATE_STOPPED;
-            ui->products_grpbox->setEnabled(false);
-            ui->speeds_grpbox->setEnabled(false);
+            ui->products_grpbox->setEnabled(true);
+            ui->speeds_grpbox->setEnabled(true);
+            ui->extruder_up_btn->setEnabled(true);
+            ui->extruder_down_btn->setEnabled(true);
+            ui->caterpillar_up_btn->setEnabled(true);
+            ui->caterpillar_down_btn->setEnabled(true);
+            ui->stepper_up_btn->setEnabled(true);
+            ui->stepper_down_btn->setEnabled(true);
+            ui->settings_btn->setVisible(true);
             ui->run_btn->setText("START");
-            ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 10px;");
+            ui->run_btn->setStyleSheet("background-color: rgb(38, 162, 105); border-radius: 30px;");
         }
     }
+    showVoltages(eERPM);
+    showVoltages(eCRPM);
 }
 
 void MainWindow::on_ss_params_editsave_btn_clicked()
@@ -549,7 +594,7 @@ void MainWindow::handleERPMIncrement(void)
         erpm = (m_cpanel_conf_ptr->analog_factor_value * ANALOG_VOLTAGE_MAX);
     m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
     ui->extruder_lcd->display(erpm);
-    setStartVoltages(eERPM);
+    showVoltages(eERPM);
 }
 
 void MainWindow::handleERPMDecrement(void)
@@ -562,7 +607,7 @@ void MainWindow::handleERPMDecrement(void)
         erpm = EXTRUDER_RPM_MIN;
     m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm = erpm;
     ui->extruder_lcd->display(erpm);
-    setStartVoltages(eERPM);
+    showVoltages(eERPM);
 }
 
 void MainWindow::handleCRPMIncrement(void)
@@ -575,7 +620,7 @@ void MainWindow::handleCRPMIncrement(void)
         crpm = (m_cpanel_conf_ptr->analog_factor_value * ANALOG_VOLTAGE_MAX);
     m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
     ui->caterpillar_lcd->display(crpm);
-    setStartVoltages(eCRPM);
+    showVoltages(eCRPM);
 }
 
 void MainWindow::handleCRPMDecrement(void)
@@ -588,7 +633,7 @@ void MainWindow::handleCRPMDecrement(void)
         crpm = CATERPILLAR_RPM_MIN;
     m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm = crpm;
     ui->caterpillar_lcd->display(crpm);
-    setStartVoltages(eCRPM);
+    showVoltages(eCRPM);
 }
 
 void MainWindow::handleColorIncrement(void)
@@ -614,11 +659,13 @@ void MainWindow::handleColorDecrement(void)
 void MainWindow::on_extruder_up_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->extruder_up_btn->setStyleSheet("image: url(:/icons/up.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_erpm_up_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_extruder_up_btn_released()
 {
+    ui->extruder_up_btn->setStyleSheet("image: url(:/icons/up.svg)");
     if (m_erpm_up_press_timer.isActive()) {
         m_erpm_up_press_timer.stop();
     }
@@ -627,11 +674,13 @@ void MainWindow::on_extruder_up_btn_released()
 void MainWindow::on_extruder_down_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->extruder_down_btn->setStyleSheet("image: url(:/icons/down.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_erpm_down_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_extruder_down_btn_released()
 {
+    ui->extruder_down_btn->setStyleSheet("image: url(:/icons/down.svg)");
     if (m_erpm_down_press_timer.isActive()) {
         m_erpm_down_press_timer.stop();
     }
@@ -640,11 +689,13 @@ void MainWindow::on_extruder_down_btn_released()
 void MainWindow::on_caterpillar_up_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->caterpillar_up_btn->setStyleSheet("image: url(:/icons/up.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_crpm_up_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_caterpillar_up_btn_released()
 {
+    ui->caterpillar_up_btn->setStyleSheet("image: url(:/icons/up.svg)");
     if (m_crpm_up_press_timer.isActive()) {
         m_crpm_up_press_timer.stop();
     }
@@ -653,11 +704,13 @@ void MainWindow::on_caterpillar_up_btn_released()
 void MainWindow::on_caterpillar_down_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->caterpillar_down_btn->setStyleSheet("image: url(:/icons/down.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_crpm_down_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_caterpillar_down_btn_released()
 {
+    ui->caterpillar_down_btn->setStyleSheet("image: url(:/icons/down.svg)");
     if (m_crpm_down_press_timer.isActive()) {
         m_crpm_down_press_timer.stop();
     }
@@ -666,11 +719,13 @@ void MainWindow::on_caterpillar_down_btn_released()
 void MainWindow::on_stepper_up_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->stepper_up_btn->setStyleSheet("image: url(:/icons/up.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_color_up_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_stepper_up_btn_released()
 {
+    ui->stepper_up_btn->setStyleSheet("image: url(:/icons/up.svg)");
     if (m_color_up_press_timer.isActive()) {
         m_color_up_press_timer.stop();
     }
@@ -679,11 +734,13 @@ void MainWindow::on_stepper_up_btn_released()
 void MainWindow::on_stepper_down_btn_pressed()
 {
     m_long_press_factor = 1;
+    ui->stepper_down_btn->setStyleSheet("image: url(:/icons/down.svg); border: 5px solid rgb(246, 97, 81); border-radius: 50px;");
     m_color_down_press_timer.start(1000); // 1 sec
 }
 
 void MainWindow::on_stepper_down_btn_released()
 {
+    ui->stepper_down_btn->setStyleSheet("image: url(:/icons/down.svg)");
     if (m_color_down_press_timer.isActive()) {
         m_color_down_press_timer.stop();
     }

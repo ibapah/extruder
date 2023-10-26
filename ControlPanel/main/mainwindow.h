@@ -26,7 +26,8 @@ public:
     void processLinkState(void);
     int initialize_io_board(void);
     int setStartVoltages(ParameterTypes type);
-    int setStopVoltages(void);
+    int setStopVoltages(void);    
+    void showVoltages(ParameterTypes type);
 
 public slots:
 
