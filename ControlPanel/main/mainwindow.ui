@@ -301,7 +301,7 @@ border-radius: 10px;</string>
            <widget class="QGroupBox" name="speeds_grpbox">
             <property name="geometry">
              <rect>
-              <x>5</x>
+              <x>370</x>
               <y>60</y>
               <width>350</width>
               <height>771</height>
@@ -519,7 +519,7 @@ QRadioButton::indicator:unchecked {
            <widget class="QGroupBox" name="products_grpbox">
             <property name="geometry">
              <rect>
-              <x>365</x>
+              <x>5</x>
               <y>60</y>
               <width>350</width>
               <height>771</height>
@@ -533,7 +533,7 @@ QRadioButton::indicator:unchecked {
              </font>
             </property>
             <property name="title">
-             <string>Products</string>
+             <string>Product</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

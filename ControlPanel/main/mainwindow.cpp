@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->setMaximumSize(1920, 1080);
     this->setGeometry(0, 0, 1920, 1080);
 
-#ifdef __arm__
+#if defined(__aarch64__)
     Qt::WindowFlags flags = this->windowFlags();
     this->setWindowFlags( flags | Qt::FramelessWindowHint );
 #endif
@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
         ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
         ui->stepper_lcd->display(QString::number(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color));
+        showVoltages(eERPM);
+        showVoltages(eCRPM);
     }
     speedBtngrp.buttons().at(m_cpanel_conf_ptr->speed_idx)->setChecked(true);
     productBtngrp.buttons().at(m_cpanel_conf_ptr->product_idx)->setChecked(true);
@@ -61,14 +63,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&m_color_up_press_timer, SIGNAL(timeout()), this, SLOT(handleColorIncrement()));
     connect(&m_color_down_press_timer, SIGNAL(timeout()), this, SLOT(handleColorDecrement()));
 
-#ifdef __arm__
+#if defined(__aarch64__)
     // check and init IO board
     if ( 0 != initialize_io_board() ) {
         return;
     }
 #endif
-    showVoltages(eERPM);
-    showVoltages(eCRPM);
 
     return;
 }
@@ -200,6 +200,8 @@ void MainWindow::processLinkState(void)
         ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
         ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
         ui->stepper_lcd->display(QString::number(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].color));
+        showVoltages(eERPM);
+        showVoltages(eCRPM);
         ui->hline1->show();
         ui->hline2->show();
         ui->hline3->show();
@@ -284,8 +286,8 @@ void MainWindow::on_stepper_down_btn_clicked()
 void MainWindow::on_settings_btn_clicked()
 {
     ui->stackedWidget->setCurrentIndex(eSETTINGS_SCREEN);
-    ui->ss_products_cbox->setCurrentIndex(1);
-    ui->ss_products_cbox->setCurrentIndex(0);
+    ui->ss_products_cbox->setCurrentIndex(m_cpanel_conf_ptr->product_idx);
+    ui->ss_speeds_cbox->setCurrentIndex(m_cpanel_conf_ptr->speed_idx);
     // disable edit
     ui->ss_maxerpm_ledit->setReadOnly(true);
     ui->ss_crpmfactor_ledit->setReadOnly(true);
@@ -306,6 +308,8 @@ void MainWindow::on_productBtngrpButtonClicked(int product_idx)
         ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm);
         ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm);
         ui->stepper_lcd->display(QString::number(m_cpanel_conf_ptr->m_products[product_idx].params[m_cpanel_conf_ptr->speed_idx].color));
+        showVoltages(eERPM);
+        showVoltages(eCRPM);
     }
 }
 
@@ -318,6 +322,8 @@ void MainWindow::on_speedBtngrpButtonClicked(int speed_idx)
         ui->extruder_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].erpm);
         ui->caterpillar_lcd->display(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].crpm);
         ui->stepper_lcd->display(QString::number(m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[speed_idx].color));
+        showVoltages(eERPM);
+        showVoltages(eCRPM);
     }
 }
 
@@ -357,7 +363,7 @@ void MainWindow::showVoltages(enum ParameterTypes type)
 int MainWindow::setStartVoltages(enum ParameterTypes type)
 {
     float volt = 0.0;
-#ifdef __arm__
+#if defined(__aarch64__)
     if (m_dev == -1 ) {
         qDebug()<<"ERROR: the IO board not initialized yet!!!";
         return -1;
@@ -367,7 +373,7 @@ int MainWindow::setStartVoltages(enum ParameterTypes type)
         // For erpm
         int erpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].erpm;
         volt = (float)((float)erpm / (float)(m_cpanel_conf_ptr->analog_factor_value));
-#ifdef __arm__
+#if defined(__aarch64__)
         // Channel 1 for erpm
         if ( 0 != analogOutVoltageWrite(m_dev, 1, volt) ) {
             qDebug()<<"ERROR: failed to set voltage for erpm!!!";
@@ -380,7 +386,7 @@ int MainWindow::setStartVoltages(enum ParameterTypes type)
         // For crpm
         int crpm = m_cpanel_conf_ptr->m_products[m_cpanel_conf_ptr->product_idx].params[m_cpanel_conf_ptr->speed_idx].crpm;
         volt = (float)((float)crpm / (float)((m_cpanel_conf_ptr->analog_factor_value)));
-#ifdef __arm__
+#if defined(__aarch64__)
         // Channel 2 for crpm
         if ( 0 != analogOutVoltageWrite(m_dev, 2, volt) ) {
             qDebug()<<"ERROR: failed to set voltage for crpm!!!";
@@ -403,7 +409,7 @@ int MainWindow::setStopVoltages(void)
 {
     float volt = 0.0;
 
-#ifdef __arm__
+#if defined(__aarch64__)
     if (m_dev == -1 ) {
         qDebug()<<"ERROR: the IO board not initialized yet!!!";
         return -1;
@@ -425,6 +431,7 @@ void MainWindow::on_run_btn_clicked()
             e_run_state = eSTATE_STARTED;
             ui->products_grpbox->setEnabled(false);
             ui->speeds_grpbox->setEnabled(false);
+            ui->linkbtn->setEnabled(false);
             ui->extruder_up_btn->setVisible(false);
             ui->extruder_down_btn->setVisible(false);
             ui->caterpillar_up_btn->setVisible(false);
@@ -440,6 +447,7 @@ void MainWindow::on_run_btn_clicked()
             e_run_state = eSTATE_STOPPED;
             ui->products_grpbox->setEnabled(true);
             ui->speeds_grpbox->setEnabled(true);
+            ui->linkbtn->setEnabled(true);
             ui->extruder_up_btn->setVisible(true);
             ui->extruder_down_btn->setVisible(true);
             ui->caterpillar_up_btn->setVisible(true);
@@ -463,6 +471,7 @@ void MainWindow::on_ss_params_editsave_btn_clicked()
         ui->ss_crpmfactor_ledit->setReadOnly(false);
         ui->ss_colorfactor_ledit->setReadOnly(false);
         ui->ss_params_editsave_btn->setStyleSheet("image: url(:/icons/save.svg); border: 1px solid #4fa08b; background-color: #222b2e;");
+        ui->ss_maxerpm_ledit->setModified(true);
     } else {
         ss_profile_edit = false;
         int speep_idx = ui->ss_speeds_cbox->currentIndex();

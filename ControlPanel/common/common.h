@@ -13,7 +13,11 @@
 #define STEPPER_COLOR_FACTOR_MIN    0.0
 #define STEPPER_COLOR_FACTOR_MAX    100.0
 
+#if defined(__aarch64__)
+#define SYSTEM_SETTINGS_FILE "/home/pi/settings.bin"
+#else
 #define SYSTEM_SETTINGS_FILE "./settings.bin"
+#endif
 
 #pragma pack(1)
 
