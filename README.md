@@ -9,7 +9,7 @@ This repository contains Qt based 'Control Panel' application for Raspberry Pi3 
 
 The latest version of Raspberry Pi3 OS image with Control Panel application available in link below.
 
-https://drive.google.com/file/d/1vjQYL5EgwOjYHnbYF_Cz_06glfxF6Y6p/view?usp=drive_link
+https://drive.google.com/file/d/1oRK6YHjNu6kxP1wbNYNiqIe0HiU0sol8/view?usp=sharing
 
 ## Steps to flash
 
