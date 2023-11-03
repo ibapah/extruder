@@ -65,7 +65,6 @@ struct ProductParams
 
 struct ControlPanelConfig
 {
-    bool link_state;
     int product_idx;
     int speed_idx;
     float analog_factor_value;

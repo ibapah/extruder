@@ -23,18 +23,16 @@ public:
     ~MainWindow();
     int createInitialSystemConfig(void);
     int initSystemSettings(void);
-    void processLinkState(void);
     int initialize_io_board(void);
     int setStartVoltages(ParameterTypes type);
     int setStopVoltages(void);    
-    void showVoltages(ParameterTypes type);
+    void showVoltages(ParameterTypes type, bool set_voltage=true);
 
 public slots:
 
 protected:
 
 private slots:
-    void on_linkbtn_clicked();
     void on_extruder_up_btn_clicked();
     void on_extruder_down_btn_clicked();
     void on_caterpillar_up_btn_clicked();

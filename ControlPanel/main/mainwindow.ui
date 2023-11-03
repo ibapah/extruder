@@ -108,7 +108,7 @@ color: rgb(243, 243, 243);</string>
             <rect>
              <x>20</x>
              <y>75</y>
-             <width>480</width>
+             <width>580</width>
              <height>205</height>
             </rect>
            </property>
@@ -146,7 +146,7 @@ border-radius: 30px;</string>
             <rect>
              <x>20</x>
              <y>405</y>
-             <width>480</width>
+             <width>580</width>
              <height>205</height>
             </rect>
            </property>
@@ -160,7 +160,7 @@ border-radius: 10px;</string>
             <rect>
              <x>20</x>
              <y>740</y>
-             <width>480</width>
+             <width>580</width>
              <height>205</height>
             </rect>
            </property>
@@ -174,7 +174,7 @@ border-radius: 10px;</string>
             <rect>
              <x>20</x>
              <y>0</y>
-             <width>480</width>
+             <width>580</width>
              <height>70</height>
             </rect>
            </property>
@@ -197,7 +197,7 @@ border-radius: 10px;</string>
             <rect>
              <x>20</x>
              <y>330</y>
-             <width>480</width>
+             <width>580</width>
              <height>70</height>
             </rect>
            </property>
@@ -220,7 +220,7 @@ border-radius: 10px;</string>
             <rect>
              <x>20</x>
              <y>670</y>
-             <width>480</width>
+             <width>580</width>
              <height>70</height>
             </rect>
            </property>
@@ -238,38 +238,13 @@ border-radius: 10px;</string>
             <set>Qt::AlignCenter</set>
            </property>
           </widget>
-          <widget class="Line" name="hline2">
-           <property name="geometry">
-            <rect>
-             <x>500</x>
-             <y>508</y>
-             <width>330</width>
-             <height>3</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
           <widget class="QGroupBox" name="groupBox_3">
            <property name="geometry">
             <rect>
              <x>1160</x>
              <y>70</y>
              <width>720</width>
-             <height>851</height>
+             <height>870</height>
             </rect>
            </property>
            <property name="font">
@@ -301,7 +276,7 @@ border-radius: 10px;</string>
            <widget class="QGroupBox" name="speeds_grpbox">
             <property name="geometry">
              <rect>
-              <x>370</x>
+              <x>5</x>
               <y>60</y>
               <width>350</width>
               <height>771</height>
@@ -519,7 +494,7 @@ QRadioButton::indicator:unchecked {
            <widget class="QGroupBox" name="products_grpbox">
             <property name="geometry">
              <rect>
-              <x>5</x>
+              <x>370</x>
               <y>60</y>
               <width>350</width>
               <height>771</height>
@@ -735,124 +710,11 @@ QRadioButton::indicator:unchecked {
             </widget>
            </widget>
           </widget>
-          <widget class="Line" name="hline1">
-           <property name="geometry">
-            <rect>
-             <x>500</x>
-             <y>180</y>
-             <width>382</width>
-             <height>3</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-          <widget class="Line" name="hline3">
-           <property name="geometry">
-            <rect>
-             <x>500</x>
-             <y>844</y>
-             <width>382</width>
-             <height>3</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-          <widget class="Line" name="hline4">
-           <property name="geometry">
-            <rect>
-             <x>930</x>
-             <y>510</y>
-             <width>230</width>
-             <height>3</height>
-            </rect>
-           </property>
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-          <widget class="Line" name="vline2">
-           <property name="geometry">
-            <rect>
-             <x>880</x>
-             <y>560</y>
-             <width>3</width>
-             <height>287</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-          <widget class="Line" name="vline1">
-           <property name="geometry">
-            <rect>
-             <x>880</x>
-             <y>180</y>
-             <width>3</width>
-             <height>283</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(39, 55, 77);</string>
-           </property>
-           <property name="lineWidth">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
           <widget class="QPushButton" name="extruder_up_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
-             <y>70</y>
+             <x>620</x>
+             <y>60</y>
              <width>100</width>
              <height>100</height>
             </rect>
@@ -867,7 +729,7 @@ QRadioButton::indicator:unchecked {
           <widget class="QPushButton" name="extruder_down_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
+             <x>620</x>
              <y>190</y>
              <width>100</width>
              <height>100</height>
@@ -883,8 +745,8 @@ QRadioButton::indicator:unchecked {
           <widget class="QPushButton" name="caterpillar_up_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
-             <y>400</y>
+             <x>620</x>
+             <y>390</y>
              <width>100</width>
              <height>100</height>
             </rect>
@@ -899,7 +761,7 @@ QRadioButton::indicator:unchecked {
           <widget class="QPushButton" name="caterpillar_down_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
+             <x>620</x>
              <y>520</y>
              <width>100</width>
              <height>100</height>
@@ -915,7 +777,7 @@ QRadioButton::indicator:unchecked {
           <widget class="QPushButton" name="stepper_down_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
+             <x>620</x>
              <y>860</y>
              <width>100</width>
              <height>100</height>
@@ -931,31 +793,14 @@ QRadioButton::indicator:unchecked {
           <widget class="QPushButton" name="stepper_up_btn">
            <property name="geometry">
             <rect>
-             <x>520</x>
-             <y>730</y>
+             <x>620</x>
+             <y>720</y>
              <width>100</width>
              <height>100</height>
             </rect>
            </property>
            <property name="styleSheet">
             <string notr="true">image: url(:/icons/up.svg);</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="linkbtn">
-           <property name="geometry">
-            <rect>
-             <x>830</x>
-             <y>460</y>
-             <width>100</width>
-             <height>100</height>
-            </rect>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">image: url(:/icons/link.svg);
-border: 3px solid rgb(39, 55, 77);</string>
            </property>
            <property name="text">
             <string/>
